@@ -23,4 +23,7 @@ jobs:
       run: npm install
       
     - name: Run tests
-      run: npm test 
+      run: npm test
+      env:
+        TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

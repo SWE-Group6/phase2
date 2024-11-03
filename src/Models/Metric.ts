@@ -16,6 +16,9 @@ export abstract class Metric {
         if (process.env.GITHUB_TOKEN) {
             this.token = process.env.GITHUB_TOKEN;
         }
+        else if (process.env.TOKEN_GITHUB) {
+            this.token = process.env.TOKEN_GITHUB;
+        }
         else {
             // throw an error
             throw new Error("GITHUB_TOKEN not found in .env file");
