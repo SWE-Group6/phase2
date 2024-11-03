@@ -1,0 +1,88 @@
+#!/usr/bin/env python3
+
+import os
+import subprocess
+import sys
+import time
+
+def run_command(cmd):
+    """Runs a shell command and returns the output and exit status."""
+    try:
+        result = subprocess.run(cmd, shell=True, check=True, capture_output=True)
+        return result.stdout.decode('utf-8'), 0
+    except subprocess.CalledProcessError as e:
+        return e.stdout.decode('utf-8') + e.stderr.decode('utf-8'), e.returncode
+
+def install():
+    """Installs npm dependencies by running `npm install`."""
+    output, code = run_command("npm install")
+    print(output)
+    return code
+
+def test():
+    """Runs the test suite by executing `npm run test`."""
+    output, code = run_command("npm run test")
+    print (f"Test code: {code}")
+    print(output)
+    return code
+
+def start_server():
+    """Starts the server using `npm start`."""
+    # Start the server process and return the process object
+    process = subprocess.Popen(["npm", "start"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    time.sleep(5)  # Wait for the server to start
+    return process
+
+def process_url_file(url_file):
+    """Reads a file with URLs and makes API calls for each URL."""
+    
+    if not os.path.exists(url_file):
+        print(f"Error: URL file '{url_file}' does not exist.")
+        return 1
+
+    # Start the server
+    server_process = start_server()
+
+    try:
+        with open(url_file, 'r') as f:
+            urls = [line.strip() for line in f if line.strip()]
+    except Exception as e:
+        print(f"Error reading URL file: {e}")
+        server_process.terminate()  # Terminate the server if file read fails
+        return 1
+
+    for url in urls:
+        api_url = f"http://localhost:3000/api/metrics?url={url}"
+        cmd = f'curl "{api_url}"'
+        output, code = run_command(cmd)
+        if code != 0:
+            print(f"Error: Failed to make API call for URL '{url}'")
+            print(output)
+            server_process.terminate()  # Terminate server on failure
+            return 1
+        else:
+            # Print output and then add a newline
+            print(output)
+
+    server_process.terminate()  # Terminate the server after processing all URLs
+    return 0
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: ./run [install|test|URL_FILE]")
+        sys.exit(1)
+
+    command = sys.argv[1]
+    
+    if command == "install":
+        sys.exit(install())
+    elif command == "test":
+        sys.exit(test())
+    elif os.path.exists(command):  # Assume it's a URL file
+        sys.exit(process_url_file(command))
+    else:
+        print(f"Unknown command or file: {command}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()

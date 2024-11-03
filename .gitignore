@@ -1,0 +1,5 @@
+/node_modules
+/ECE461-Part-1-CLI-Checker
+.env
+/dist
+walk
