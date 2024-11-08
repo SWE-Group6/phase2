@@ -1,6 +1,6 @@
 import { AllMetrics } from "./AllMetrics";
 import { BusFactor } from "./BusFactor";
-import  { Correctness } from "./Correctness";
+import { Correctness } from "./Correctness";
 import { RampUp } from "./RampUp";
 import { ResponsiveMaintainer } from "./ResponsiveMaintainer";
 
@@ -12,7 +12,7 @@ export class Package {
         this.url = url;
         this.packageMetrics = new AllMetrics(url);
 
-        
+
 
     }
 
@@ -35,7 +35,9 @@ export class Package {
             RampUp: this.packageMetrics.metrics[3].getScore(),
             RampUp_Latency: this.packageMetrics.metrics[3].getLatency(),
             License: this.packageMetrics.metrics[4].getScore(),
-            License_Latency: this.packageMetrics.metrics[4].getLatency()
+            License_Latency: this.packageMetrics.metrics[4].getLatency(),
+            PulledCode: this.packageMetrics.metrics[5].getScore(),
+            PulledCode_Latency: this.packageMetrics.metrics[5].getLatency()
         };
     }
 }
