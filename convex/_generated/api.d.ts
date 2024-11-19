@@ -24,6 +24,7 @@ import type * as package_rate_Models_Metric from "../package_rate/Models/Metric.
 import type * as package_rate_Models_Package from "../package_rate/Models/Package.js";
 import type * as package_rate_Models_RampUp from "../package_rate/Models/RampUp.js";
 import type * as package_rate_Models_ResponsiveMaintainer from "../package_rate/Models/ResponsiveMaintainer.js";
+import type * as queries_packageTable_getPackageById from "../queries/packageTable/getPackageById.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -45,6 +46,7 @@ declare const fullApi: ApiFromModules<{
   "package_rate/Models/Package": typeof package_rate_Models_Package;
   "package_rate/Models/RampUp": typeof package_rate_Models_RampUp;
   "package_rate/Models/ResponsiveMaintainer": typeof package_rate_Models_ResponsiveMaintainer;
+  "queries/packageTable/getPackageById": typeof queries_packageTable_getPackageById;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

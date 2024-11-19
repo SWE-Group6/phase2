@@ -4,6 +4,7 @@
 
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import { Package } from "./package_rate/Models/Package";
 
 export default defineSchema(
   {
@@ -17,6 +18,17 @@ export default defineSchema(
     numbers: defineTable({
       value: v.number(),
     }),
+    packageTable: defineTable({
+      packageName: v.string(),
+      packageProvider: v.union(
+        v.literal('GitHub'),
+        v.literal('NPM'),
+        v.literal('upload')
+      ),
+      avlVersions: v.array(v.string()), // Array of allowed versions as strings
+      packageURL: v.string(),
+      packageOwner: v.string()
+    })
   },
   // If you ever get an error about schema mismatch
   // between your data and your schema, and you cannot
