@@ -20,7 +20,7 @@ http.route({
 });
 
 http.route({
-    path: "/packages",
+    pathPrefix: "/packages/", // Dynamic path parameter for package ID
     method: "GET",
     handler: getPackageByIdHTTPHandler,
 });

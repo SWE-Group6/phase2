@@ -58,11 +58,12 @@ export const packageRateHandler = httpAction(async (ctx, request) => {
 
 export const getPackageByIdHTTPHandler = httpAction(async (ctx, request) => {
   const url = new URL(request.url);
-  const packageId = url.searchParams.get("id") ?? request.headers.get("id") ?? null;
+  const pathParts = url.pathname.split("/"); // Split the path into parts
+  const packageId = pathParts[pathParts.length - 1]; // Extract the last segment as the package ID
 
-  if (packageId === null) {
+  if (!packageId) {
     return new Response(
-      "Did not specify 'id' as query param or header",
+      "Package ID not specified in the URL path",
       { status: 400 }
     );
   }
