@@ -69,7 +69,7 @@ export const getPackageByIdHTTPHandler = httpAction(async (ctx, request) => {
 
   try {
     // Use ctx.runQuery with the correct function reference from the generated API
-    const pkg = await ctx.runQuery(api.queries.packageTable.getPackageById.getPackageById, { packageId });
+    const pkg = await ctx.runQuery(api.queries.packageTable.getPackageById, { packageId });
     
     if (!pkg) {
       return new Response(`Package with ID ${packageId} not found.`, { status: 404 });
