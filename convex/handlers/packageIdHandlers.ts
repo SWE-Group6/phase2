@@ -24,6 +24,6 @@ export const getPackageByIdHTTPHandler = httpAction(async (ctx, request) => {
 
     return new Response(JSON.stringify(pkg), { status: 200 });
   } catch (error: any) {
-    return new Response(error.message, { status: 500 });
+    return new Response(error.message, { status: 404 });
   }
 });

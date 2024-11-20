@@ -16,11 +16,11 @@ export default defineSchema(
       data: v.union(
         v.object({
           Content: v.string(), // Base64 encoded zip file content
-          JSProgram: v.optional(v.string()), // Optional JavaScript program (for sensitive modules)
+          JSProgram: v.string(), // Optional JavaScript program (for sensitive modules)
         }),
         v.object({
           URL: v.string(), // URL for public ingestion
-          JSProgram: v.optional(v.string()), // Optional JavaScript program (for sensitive modules)
+          JSProgram: v.string(), // Optional JavaScript program (for sensitive modules)
         })
       ),
     })
