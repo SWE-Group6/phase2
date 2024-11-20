@@ -14,7 +14,7 @@ export const getPackageById = query({
 });
 
 
-export const getPackages = query({
+export const getPackagesMetadata = query({
     args: {},
     handler: async (ctx: any, args: any) => {
          
@@ -22,7 +22,9 @@ export const getPackages = query({
         pkgs.forEach((pkg: any) => {
             pkg.metadata.ID = pkg._id;
         });
-        return pkgs;
+        //only return the metadata
+        const packagesMetadata = pkgs.map((pkg: any) => pkg.metadata);
+        return packagesMetadata;
     },
 });
   
