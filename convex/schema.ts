@@ -8,26 +8,21 @@ import { Package } from "./package_rate/Models/Package";
 
 export default defineSchema(
   {
-    documents: defineTable({
-      fieldOne: v.string(),
-      fieldTwo: v.object({
-        subFieldOne: v.array(v.number()),
-      }),
-    }),
-    // This definition matches the example query and mutation code:
-    numbers: defineTable({
-      value: v.number(),
-    }),
     packageTable: defineTable({
-      packageName: v.string(),
-      packageProvider: v.union(
-        v.literal('GitHub'),
-        v.literal('NPM'),
-        v.literal('upload')
+      metadata: v.object({
+        Name: v.string(), // Package name
+        Version: v.string(), // Package version
+      }),
+      data: v.union(
+        v.object({
+          Content: v.string(), // Base64 encoded zip file content
+          JSProgram: v.optional(v.string()), // Optional JavaScript program (for sensitive modules)
+        }),
+        v.object({
+          URL: v.string(), // URL for public ingestion
+          JSProgram: v.optional(v.string()), // Optional JavaScript program (for sensitive modules)
+        })
       ),
-      avlVersions: v.array(v.string()), // Array of allowed versions as strings
-      packageURL: v.string(),
-      packageOwner: v.string()
     })
   },
   // If you ever get an error about schema mismatch

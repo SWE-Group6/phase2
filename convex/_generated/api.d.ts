@@ -17,7 +17,6 @@ import type * as handlers_packageIdHandlers from "../handlers/packageIdHandlers.
 import type * as handlers_packageRateHandlers from "../handlers/packageRateHandlers.js";
 import type * as handlers_trial from "../handlers/trial.js";
 import type * as http from "../http.js";
-import type * as myFunctions from "../myFunctions.js";
 import type * as package_rate_Models_AllMetrics from "../package_rate/Models/AllMetrics.js";
 import type * as package_rate_Models_BusFactor from "../package_rate/Models/BusFactor.js";
 import type * as package_rate_Models_Correctness from "../package_rate/Models/Correctness.js";
@@ -41,7 +40,6 @@ declare const fullApi: ApiFromModules<{
   "handlers/packageRateHandlers": typeof handlers_packageRateHandlers;
   "handlers/trial": typeof handlers_trial;
   http: typeof http;
-  myFunctions: typeof myFunctions;
   "package_rate/Models/AllMetrics": typeof package_rate_Models_AllMetrics;
   "package_rate/Models/BusFactor": typeof package_rate_Models_BusFactor;
   "package_rate/Models/Correctness": typeof package_rate_Models_Correctness;
