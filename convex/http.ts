@@ -1,7 +1,7 @@
 import { httpRouter } from "convex/server";
-import { helloHandler, packageRateHandler, getPackageByIdHTTPHandler } from "./api";
-import { httpAction, ActionCtx } from "./_generated/server";
-
+import { helloHandler } from "./handlers/trial";
+import { packageRateHandler } from "./handlers/packageRateHandlers";
+import { getPackageByIdHTTPHandler } from "./handlers/packageIdHandlers";
 
 const http = httpRouter();
 
