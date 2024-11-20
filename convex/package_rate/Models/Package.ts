@@ -29,11 +29,17 @@ export class Package {
         console.log("Getting Metrics");
         return {
             BusFactor: this.packageMetrics.metrics[0].getScore(),
+            BusFactorLatency: this.packageMetrics.metrics[0].getLatency(),
             Correctness: this.packageMetrics.metrics[1].getScore(),
+            CorrectnessLatency: this.packageMetrics.metrics[1].getLatency(),
             RampUp: this.packageMetrics.metrics[3].getScore(),
+            RampUpLatency: this.packageMetrics.metrics[3].getLatency(),
             ResponsiveMaintainer: this.packageMetrics.metrics[2].getScore(),
+            ResponsiveMaintainerLatency: this.packageMetrics.metrics[2].getLatency(),
             LicenseScore: this.packageMetrics.metrics[4].getScore(),
-            NetScore: this.packageMetrics.getNetScore()
+            LicenseScoreLatency: this.packageMetrics.metrics[4].getLatency(),
+            NetScore: this.packageMetrics.getNetScore(),
+            NetScoreLatency: this.packageMetrics.getNetScoreLatency()
         };
     }
 }
