@@ -1,6 +1,7 @@
 import { query } from "../_generated/server";
 import { v } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
+import semver from 'semver'; // Import semver
 
 export const getPackageById = query({
   args: { packageId: v.id("packageTable") }, // Validate that packageId is an ID from "packageTable"
@@ -52,43 +53,15 @@ export const getPackagesMetadata = query({
                 packagesMetadata = packagesMetadata.filter((pkg: any) => pkg.Name === Name);
             }
             if (Version) {
-              // Define regex patterns for different version types
-              const exactVersion = Version.match(/^\d+\.\d+\.\d+$/);
-              const boundedRange = Version.match(/^\d+\.\d+\.\d+-\d+\.\d+\.\d+$/);
-              const carat = Version.match(/^\^\d+\.\d+\.\d+$/);
-              const tilde = Version.match(/^~\d+\.\d+\.\d+$/);
-      
-              if (exactVersion) {
-                  // Exact version: Match the exact version string
-                  packagesMetadata = packagesMetadata.filter((pkg: any) => pkg.Version === Version);
-              } else if (boundedRange) {
-                  // Bounded range: Match versions within the specified range
-                  const [minVersion, maxVersion] = Version.split('-');
-                  packagesMetadata = packagesMetadata.filter(
-                      (pkg: any) => pkg.Version >= minVersion && pkg.Version <= maxVersion
-                  );
-              } else if (carat) {
-                  // Caret: Match versions compatible with the given major/minor version
-                  const [major, minor, patch] = Version.slice(1).split('.').map(Number);
-                  const minVersion = `${major}.${minor}.${patch}`;
-                  const maxVersion = major === 0
-                      ? `${major}.${minor + 1}.0` // If major is 0, caret considers the minor version fixed
-                      : `${major + 1}.0.0`; // Else major is flexible
-                  packagesMetadata = packagesMetadata.filter(
-                      (pkg: any) => pkg.Version >= minVersion && pkg.Version < maxVersion
-                  );
-              } else if (tilde) {
-                  // Tilde: Match versions with fixed minor and flexible patch
-                  const [major, minor, patch] = Version.slice(1).split('.').map(Number);
-                  const minVersion = `${major}.${minor}.${patch}`;
-                  const maxVersion = `${major}.${minor + 1}.0`; // Minor is fixed, patches are flexible
-                  packagesMetadata = packagesMetadata.filter(
-                      (pkg: any) => pkg.Version >= minVersion && pkg.Version < maxVersion
-                  );
-              } else {
-                  throw new Error('Invalid Version filter. Please provide a valid version filter.');
-              }
-          }      
+                // Use semver for version filtering
+                if (semver.valid(Version)) {
+                    packagesMetadata = packagesMetadata.filter((pkg: any) => pkg.Version === Version);
+                } else if (semver.validRange(Version)) {
+                    packagesMetadata = packagesMetadata.filter((pkg: any) => semver.satisfies(pkg.Version, Version));
+                } else {
+                    throw new Error('Invalid Version filter. Please provide a valid version filter.');
+                }
+            }      
         }
         return {
             packagesData: packagesMetadata,
