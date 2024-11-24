@@ -34,5 +34,21 @@ export const getPackagesMetadata = query({
         };
     },
 });
-  
+
+
+export const getPackageByRegex = query({
+  args: { regex: v.string() },
+  handler: async (ctx: any, args: any) => {
+    const result = await ctx.db.query("packageTable").collect(); // Fetch all packages
+    //filter the packages based on the regex
+    const regex = new RegExp(args.regex, 'i');
+    const filteredPackages = result.filter((pkg: any) => regex.test(pkg.metadata.Name));
+    console.log('Filtered Packages:', filteredPackages);
+    //only return the metadata
+    filteredPackages.forEach((pkg: any) => {
+        pkg.metadata.ID = pkg._id;
+    });
+    return filteredPackages;
+  },
+});
   
