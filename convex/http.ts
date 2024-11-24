@@ -2,6 +2,8 @@ import { httpRouter } from "convex/server";
 import { helloHandler } from "./handlers/trial";
 import { getPackageByIdHTTPHandler } from "./handlers/packageIdHandlers";
 import { getPackagesHTTPHandler } from "./handlers/packageHandlers";
+import { getPackageByRegexHTTPHandler } from "./handlers/packageByRegexHandlers";
+import { getTracksHTTPHandler } from "./handlers/trackHandlers";
 
 const http = httpRouter();
 
@@ -13,13 +15,20 @@ http.route({
 });
 
 http.route({
-    path: "/packages", // Dynamic path parameter for package ID
-    method: "GET",
+    path: "/packages",
+    method: "POST",
     handler: getPackagesHTTPHandler,
 });
 
 http.route({
-    pathPrefix: "/packages/", // Dynamic path parameter for package ID
+    path: "/package/byRegEx",
+    method: "POST",
+    handler: getPackageByRegexHTTPHandler,
+});
+
+
+http.route({
+    pathPrefix: "/package/", // Dynamic path parameter for package ID
     method: "GET",
     handler: getPackageByIdHTTPHandler,
 });
@@ -29,5 +38,12 @@ http.route({
     method: "POST",
     handler: uploadPackageHandler,
 });
+
+http.route({
+    path: "/tracks",
+    method: "GET",
+    handler: getTracksHTTPHandler,
+});
+
 
 export default http;

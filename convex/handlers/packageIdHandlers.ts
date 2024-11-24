@@ -6,19 +6,11 @@ import { Package } from "../package_rate/Models/Package"
 const generateResponse = async (action: string, pkg: any) => {
   if (action === 'rate') {
     const packageUrl = pkg["data"]["URL"];
-    if (!packageUrl) {
-      console.log('URL not found. Package is a manual upload.');
-      return new Response(`URL not found. Package is a manual upload.`, { status: 404 });
+    const metrics = await ratePackage(packageUrl);
+    if (metrics.error) {
+      return new Response(metrics.error, { status: 500 });
     }
-    const metricsPackage = new Package(packageUrl); // Assuming version is optional
-    try {
-      const metrics = await metricsPackage.getMetrics();
-      return new Response(JSON.stringify(metrics), { status: 200 });
-    }
-    catch (error) {
-      console.error('The package rating system choked on at least one of the metrics.:', error);
-      return new Response(JSON.stringify({ error: 'Failed to fetch metrics' }), { status: 500 });
-    }
+    return new Response(JSON.stringify(metrics), { status: 200 });
   } else {
     if (!pkg) {
       console.log('Package not found.');
@@ -50,3 +42,22 @@ export const getPackageByIdHTTPHandler = httpAction(async (ctx, request) => {
     return new Response(error.message, { status: error.status || 404 });
   }
 });
+
+
+//make a method that will handle the package rate. takes in the package url and returns the metrics
+//does not have to be a httpAction
+export const ratePackage = async (packageUrl: string) => {
+  if (!packageUrl) {
+    console.log('URL not found. Package is a manual upload.');
+    return { error: 'URL not found. Package is a manual upload.' };
+  }
+  const metricsPackage = new Package(packageUrl); // Assuming version is optional
+  try {
+    const metrics = await metricsPackage.getMetrics();
+    return metrics;
+  }
+  catch (error) {
+    console.error('The package rating system choked on at least one of the metrics.:', error);
+    return { error: 'Failed to fetch metrics' };
+  }
+}

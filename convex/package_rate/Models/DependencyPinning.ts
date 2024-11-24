@@ -10,7 +10,7 @@ interface PinnedDependency {
 }
 
 export class DependencyPinning extends Metric {
-    public weight: number = 1; // Initialize weight, or set it as needed
+    public weight: number = 0.1; // Initialize weight, or set it as needed
 
     constructor(public url: string) {
         super(url);

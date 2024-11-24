@@ -11,7 +11,7 @@ import axios from 'axios';
 // Responsive Maintainer Metric Class for evaluating responsiveness based on GitHub issues and NPM package data.
 export class ResponsiveMaintainer extends Metric {
     // The weight was assigned
-    public weight: number = 0.25; 
+    public weight: number = 0.20; 
     public owner: string = ''; 
     public repo: string = ''; 
     protected packageName: string = ''; 

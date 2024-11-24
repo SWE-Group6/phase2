@@ -13,7 +13,7 @@ import {Metric} from "./Metric";
 import axios from 'axios'; // simplify GET requests! 
 
 export class License extends Metric {
-    public weight: number = 0.2;
+    public weight: number = 0.15;
     private owner: string = '';
     private repo: string = '';
     private packageName: string = '';

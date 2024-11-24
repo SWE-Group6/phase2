@@ -60,7 +60,7 @@ interface Response {
 }
 
 export class BusFactor extends Metric {
-  public weight: number = 0.25;
+  public weight: number = 0.20;
 
   constructor(url: string) {
       super(url);
