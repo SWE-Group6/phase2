@@ -23,9 +23,19 @@ export const uploadPackage = mutation({
 		}
 
 		// Check if package already exists.
+		const existingPackage = await ctx.runQuery(api.queries.packageTable.checkPackage, {
+			packageName: Name,
+			packageVer: Version,
+		});
 
 		if (existingPackage) {
-
+			return {
+				metadata: {
+					Name,
+					Version,
+				},
+				message: "Package already exists.",
+			};
 		} // Return existing metadata.
 
 		// Upload new package.
@@ -43,7 +53,7 @@ export const uploadPackage = mutation({
 			metadata: {
 				Name, 
 				Version, 
-				ID,
+				ID: insertedPackage._id,
 			},
 			data: packageData,
 		};
