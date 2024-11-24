@@ -1,7 +1,7 @@
 import { query } from "../_generated/server";
 import { v } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
-import semver from 'semver'; // Import semver
+import semver from 'semver';
 
 export const getPackageById = query({
   args: { packageId: v.id("packageTable") }, // Validate that packageId is an ID from "packageTable"
