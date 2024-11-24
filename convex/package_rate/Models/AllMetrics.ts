@@ -5,6 +5,8 @@ import { ResponsiveMaintainer } from "./ResponsiveMaintainer";
 import { RampUp } from "./RampUp";
 import { License } from "./License";
 import * as fs from 'fs';
+import { PulledCode } from "./PulledCode";
+import { DependencyPinning } from "./DependencyPinning";
 
 export class AllMetrics {
     // make an array of all metrics
@@ -19,10 +21,12 @@ export class AllMetrics {
         this.metrics.push(new ResponsiveMaintainer(url));
         this.metrics.push(new RampUp(url));
         this.metrics.push(new License(url));
+        this.metrics.push(new PulledCode(url));
+        this.metrics.push(new DependencyPinning(url));
         this.url = url;
-        
+
     }
-    
+
     public async calculateNetScore(): Promise<number> {
         if (this.checkUrlType(this.url) === 'npm') {
             await Promise.all(this.metrics.map(metric => metric.calculateScoreNPM()));
@@ -31,8 +35,8 @@ export class AllMetrics {
                 // console.log(metric.constructor.name);
                 // console.log("Score: " + metric.getScore());
                 // console.log("Weight: " + metric.weight);
-                this.netScore += metric.getScore() * metric.weight;     
-                this.netScoreLatency += metric.getLatency();       
+                this.netScore += metric.getScore() * metric.weight;
+                this.netScoreLatency += metric.getLatency();
             });
         }
         else {
@@ -43,7 +47,7 @@ export class AllMetrics {
                 // console.log("Score: " + metric.getScore());
                 // console.log("Weight: " + metric.weight);
                 this.netScore += metric.getScore() * metric.weight;
-                this.netScoreLatency += metric.getLatency();     
+                this.netScoreLatency += metric.getLatency();
             });
         }
 
@@ -61,14 +65,14 @@ export class AllMetrics {
     public checkUrlType(url: string): 'npm' | 'github' | 'unknown' {
         const npmRegex = /^(https?:\/\/)?(www\.)?npmjs\.com/i;
         const githubRegex = /^(https?:\/\/)?(www\.)?github\.com/i;
-      
+
         if (npmRegex.test(url)) {
-          return 'npm';
+            return 'npm';
         } else if (githubRegex.test(url)) {
-          return 'github';
+            return 'github';
         } else {
-          return 'unknown';
+            return 'unknown';
         }
-      }
+    }
 
 }

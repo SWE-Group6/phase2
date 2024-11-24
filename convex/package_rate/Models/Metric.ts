@@ -7,19 +7,19 @@ export abstract class Metric {
     url: string;
     abstract weight: number;
     public token: string;
-    
+
     constructor(url: string) {
         this.score = 0;
         this.latency = 0;
         this.url = url;
-        
+
         if (process.env.GITHUB_TOKEN) {
             this.token = process.env.GITHUB_TOKEN;
         }
         else if (process.env.TOKEN_GITHUB) {
             this.token = process.env.TOKEN_GITHUB;
         }
-        
+
         else {
             // throw an error
             throw new Error("GITHUB_TOKEN not found in .env file");

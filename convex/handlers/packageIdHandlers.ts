@@ -21,7 +21,7 @@ const generateResponse = async (action: string, pkg: any) => {
     }
   } else {
     if (!pkg) {
-        console.log('Package not found.');
+      console.log('Package not found.');
       return new Response(`Package not found.`, { status: 404 });
     }
     return new Response(JSON.stringify(pkg), { status: 200 });
@@ -35,14 +35,14 @@ export const getPackageByIdHTTPHandler = httpAction(async (ctx, request) => {
   const packageId = pathParts[2]; // Assuming "/package/{id}/rate"
   const action = pathParts[3]; // This should be "rate"
   console.log('packageId:', packageId);
-  
+
   if (!packageId) {
     return new Response(
       "Package ID not specified in the URL path",
       { status: 400 }
     );
   }
-  
+
   try {
     const pkg = await ctx.runQuery(api.queries.packageTable.getPackageById, { packageId }); // Fetch package using the query
     return await generateResponse(action, pkg); // Generate response using the new function

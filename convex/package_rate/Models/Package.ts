@@ -1,6 +1,8 @@
 import { AllMetrics } from "./AllMetrics";
 import { BusFactor } from "./BusFactor";
-import  { Correctness } from "./Correctness";
+import { Correctness } from "./Correctness";
+import { DependencyPinning } from "./DependencyPinning";
+import { PulledCode } from "./PulledCode";
 import { RampUp } from "./RampUp";
 import { ResponsiveMaintainer } from "./ResponsiveMaintainer";
 
@@ -12,7 +14,7 @@ export class Package {
         this.url = url;
         this.packageMetrics = new AllMetrics(url);
 
-        
+
 
     }
 
@@ -32,12 +34,16 @@ export class Package {
             BusFactorLatency: this.packageMetrics.metrics[0].getLatency(),
             Correctness: this.packageMetrics.metrics[1].getScore(),
             CorrectnessLatency: this.packageMetrics.metrics[1].getLatency(),
-            RampUp: this.packageMetrics.metrics[3].getScore(),
-            RampUpLatency: this.packageMetrics.metrics[3].getLatency(),
             ResponsiveMaintainer: this.packageMetrics.metrics[2].getScore(),
             ResponsiveMaintainerLatency: this.packageMetrics.metrics[2].getLatency(),
+            RampUp: this.packageMetrics.metrics[3].getScore(),
+            RampUpLatency: this.packageMetrics.metrics[3].getLatency(),
             LicenseScore: this.packageMetrics.metrics[4].getScore(),
             LicenseScoreLatency: this.packageMetrics.metrics[4].getLatency(),
+            PulledCode: this.packageMetrics.metrics[5].getScore(),
+            PulledCodeLatency: this.packageMetrics.metrics[5].getLatency(),
+            DependencyPinning: this.packageMetrics.metrics[6].getScore(),
+            DependencyPinningLatency: this.packageMetrics.metrics[6].getLatency(),
             NetScore: this.packageMetrics.getNetScore(),
             NetScoreLatency: this.packageMetrics.getNetScoreLatency()
         };
