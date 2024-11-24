@@ -6,6 +6,7 @@ import { v } from "convex/values";
 export const uploadPackage = mutation({
 	args: { zippedPackage: v.optional(v.string()), // Base64 encoded zip file content.
 		linkedPackage: v.optional(v.string()), // URL for the package.
+		Name: v.optional(v.string()),
 		JSProgram: v.string(), // I guess the helper code that will help?
 	},
 	handler: async (ctx: any, args: any) => {
@@ -13,7 +14,6 @@ export const uploadPackage = mutation({
 		
 		let Version: string | null = null; // Extract package version.
 
-		// I can either write more code to get the actual version if not provided or we can just use 1.0.0 as default.
 		if (linkedPackage) {
 			// https://www.geeksforgeeks.org/typescript-string-match-method/
 			const match = linkedPackage.match(/\/v(\d+\.\d+\.\d+)/);
