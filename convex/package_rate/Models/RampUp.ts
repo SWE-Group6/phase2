@@ -17,7 +17,7 @@ import OpenAI from 'openai';
 
 
 export class RampUp extends Metric {
-    public weight: number = 0.15;
+    public weight: number = 0.10;
     private owner: string = '';
     private repo: string = '';
     private openaiToken: string = '';

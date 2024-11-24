@@ -39,7 +39,7 @@ interface Response {
 }
 
 export class PulledCode extends Metric {
-    public weight: number = 0.25;
+    public weight: number = 0.10;
 
     constructor(url: string) {
         super(url);
