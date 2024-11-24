@@ -24,4 +24,10 @@ http.route({
     handler: getPackageByIdHTTPHandler,
 });
 
+http.route({
+    path: "/package/upload", 
+    method: "POST",
+    handler: uploadPackageHandler,
+});
+
 export default http;
