@@ -3,6 +3,7 @@ import { helloHandler } from "./handlers/trial";
 import { getPackageByIdHTTPHandler } from "./handlers/packageIdHandlers";
 import { getPackagesHTTPHandler } from "./handlers/packageHandlers";
 import { getPackageByRegexHTTPHandler } from "./handlers/packageByRegexHandlers";
+import { getTracksHTTPHandler } from "./handlers/trackHandlers";
 
 const http = httpRouter();
 
@@ -32,6 +33,11 @@ http.route({
     handler: getPackageByIdHTTPHandler,
 });
 
+http.route({
+    path: "/tracks",
+    method: "GET",
+    handler: getTracksHTTPHandler,
+});
 
 
 export default http;

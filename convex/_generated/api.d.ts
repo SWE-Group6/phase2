@@ -16,6 +16,7 @@ import type {
 import type * as handlers_packageByRegexHandlers from "../handlers/packageByRegexHandlers.js";
 import type * as handlers_packageHandlers from "../handlers/packageHandlers.js";
 import type * as handlers_packageIdHandlers from "../handlers/packageIdHandlers.js";
+import type * as handlers_trackHandlers from "../handlers/trackHandlers.js";
 import type * as handlers_trial from "../handlers/trial.js";
 import type * as http from "../http.js";
 import type * as package_rate_Models_AllMetrics from "../package_rate/Models/AllMetrics.js";
@@ -42,6 +43,7 @@ declare const fullApi: ApiFromModules<{
   "handlers/packageByRegexHandlers": typeof handlers_packageByRegexHandlers;
   "handlers/packageHandlers": typeof handlers_packageHandlers;
   "handlers/packageIdHandlers": typeof handlers_packageIdHandlers;
+  "handlers/trackHandlers": typeof handlers_trackHandlers;
   "handlers/trial": typeof handlers_trial;
   http: typeof http;
   "package_rate/Models/AllMetrics": typeof package_rate_Models_AllMetrics;
