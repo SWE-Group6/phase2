@@ -36,12 +36,13 @@ export const uploadPackage = mutation({
 				},
 				message: "Package already exists.",
 			};
-		} // Return existing metadata.
+		} // Return existing metadata and provide code 409.
 
 		// Upload new package.
 		// Before upload, we have to make sure it scores good (call method scoring method).
 		// If a zipped package was provided, then the data would be the content. Otherwise, we store the link.
 		packageData = zippedPackage ? { Content: zippedPackage, JSProgram } : { URL: linkedPackage, JSProgram };	
+		// Abort upload if score does not meet threshold and provide code 424.
 
 		const insertedPackage = await ctx.db.insert("packageTable", { 
 			metadata: { Name, Version },
