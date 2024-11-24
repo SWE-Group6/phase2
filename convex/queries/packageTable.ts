@@ -28,4 +28,22 @@ export const getPackagesMetadata = query({
     },
 });
   
-  
+export const checkForPackage = query({
+      args: {
+      	packageName: v.string(),
+	packageVer: v.string(),
+      },
+      returns: v.boolean(),
+      handler: async (ctx, args) => {
+	      const result = await ctx.db.query("packageTable")
+	      .filter((q) =>
+		      q.and(
+			      // Fields are nested ;-;
+			      q.eq(q.field("metadata").field("Name"), args.packageName),
+			      q.eq(q.field("metadata").field("Version"), args.packageVer)
+		      )
+		     )
+		     .first();
+	      return result !== null;
+      },
+}); 
