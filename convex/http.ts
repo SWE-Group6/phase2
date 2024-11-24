@@ -16,7 +16,7 @@ http.route({
 
 http.route({
     path: "/packages",
-    method: "GET",
+    method: "POST",
     handler: getPackagesHTTPHandler,
 });
 
@@ -28,7 +28,7 @@ http.route({
 
 
 http.route({
-    pathPrefix: "/packages/", // Dynamic path parameter for package ID
+    pathPrefix: "/package/", // Dynamic path parameter for package ID
     method: "GET",
     handler: getPackageByIdHTTPHandler,
 });
