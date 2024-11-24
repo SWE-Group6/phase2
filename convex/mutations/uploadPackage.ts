@@ -30,11 +30,8 @@ export const uploadPackage = mutation({
 
 		if (existingPackage) {
 			return {
-				metadata: {
-					Name,
-					Version,
-				},
-				message: "Package already exists.",
+				conflict: true,
+				metadata: existingPackage,
 			};
 		} // Return existing metadata and provide code 409.
 
@@ -51,6 +48,7 @@ export const uploadPackage = mutation({
 
 		// After uploading
 		return {
+			conflict: false, 
 			metadata: {
 				Name, 
 				Version, 
