@@ -49,7 +49,6 @@
     "cmdk": "^0.2.0",
     "convex": "^1.17.0",
     "convex-helpers": "^0.1.65",
-    "crypto": "^1.0.1",
     "date-fns": "^2.30.0",
     "node-fetch": "^3.3.2",
     "openai": "^4.72.0",
