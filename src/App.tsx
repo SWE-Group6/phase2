@@ -31,7 +31,7 @@ export default function App() {
 function SignedIn() {
   return (
     <>
-      <p>Welcome to the application!</p>
+      <p>Welcome to the application !</p>
     </>
   );
 }
