@@ -4,6 +4,7 @@ import { getPackageByIdHTTPHandler } from "./handlers/packageIdHandlers";
 import { getPackagesHTTPHandler } from "./handlers/packageHandlers";
 import { getPackageByRegexHTTPHandler } from "./handlers/packageByRegexHandlers";
 import { getTracksHTTPHandler } from "./handlers/trackHandlers";
+import { resetHandler } from "./handlers/resetHandler";
 
 const http = httpRouter();
 
@@ -37,6 +38,12 @@ http.route({
     path: "/tracks",
     method: "GET",
     handler: getTracksHTTPHandler,
+});
+
+http.route({
+    path: "/reset",
+    method: "DELETE",
+    handler: resetHandler,
 });
 
 
