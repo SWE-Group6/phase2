@@ -23,8 +23,22 @@ export default defineSchema(
           JSProgram: v.string(), // Optional JavaScript program (for sensitive modules)
         })
       ),
-    })
+    }),
+
+    packageScores: defineTable({
+    	Name: v.string(),
+    	Version: v.string(),
+    	BusFactorScore: v.float64(),
+    	CorrectnessScore: v.float64(),
+    	DependancyScore: v.float64(),
+    	LicenseScore: v.float64(),
+    	NetScore: v.float64(),
+    	PulledCodeScore: v.float64(),
+    	RampUpScore: v.float64(),
+    	ResponsiveMaintainerScore: v.float64(),
+    }),
   },
+  
   // If you ever get an error about schema mismatch
   // between your data and your schema, and you cannot
   // change the schema to match the current data in your database,

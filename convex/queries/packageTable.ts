@@ -86,4 +86,27 @@ export const getPackageByRegex = query({
     return filteredPackages;
   },
 });
-  
+
+// This query will:
+// 1. Check if a package exists in the database.
+// 2. Return either True or False.
+export const checkForPackage = query({
+	args: {
+		packageName: v.string(),
+		packageVersion: v.string(),
+	},
+	returns: v.boolean(),
+	handler: async (ctx, args) => {
+		const result = await ctx.db.query("packageTable")
+		.filter((q) =>
+			q.and(
+				// Nested fields.
+				q.eq(q.field("metadata.Name"), args.packageName),
+				q.eq(q.field("metadata.Version"), args.packageVersion)
+			)
+		       )
+		       .first();
+
+		       return result !== null;
+	},
+});
