@@ -5,12 +5,12 @@ import { v } from "convex/values";
 // This mutation will:
 // 1. Upload a package to the database and return its unique ID.
 export const uploadPackage = mutation({
-	args: {
-		packageName: v.string(),
-		packageVersion: v.string(),
-		Content: v.optional(v.string()),
-		URL: v.optional(v.string()),
-	},
+	args: v.object({
+  		packageName: v.string(),
+  		packageVersion: v.string(),
+  		Content: v.optional(v.string()),
+  		URL: v.optional(v.string()),
+	}),
 	handler: async (ctx, args) => {
 		const { packageName, packageVersion, Content, URL } = args;
 
@@ -22,9 +22,11 @@ export const uploadPackage = mutation({
 			data: Content
 			? {
 				Content,
+				JSProgram: "",
 			}
 			: { 
 				URL: URL!,
+				JSProgram: "",
 			},
 		};
 

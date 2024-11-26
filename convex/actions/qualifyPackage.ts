@@ -1,3 +1,5 @@
+"use node";
+
 import { api } from "../_generated/api";
 import { query, action, ActionCtx } from "../_generated/server";
 import { v } from "convex/values";
