@@ -13,6 +13,7 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as actions_qualifyPackage from "../actions/qualifyPackage.js";
 import type * as handlers_packageByRegexHandlers from "../handlers/packageByRegexHandlers.js";
 import type * as handlers_packageHandlers from "../handlers/packageHandlers.js";
 import type * as handlers_packageIdHandlers from "../handlers/packageIdHandlers.js";
@@ -40,6 +41,7 @@ import type * as queries_packageTable from "../queries/packageTable.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  "actions/qualifyPackage": typeof actions_qualifyPackage;
   "handlers/packageByRegexHandlers": typeof handlers_packageByRegexHandlers;
   "handlers/packageHandlers": typeof handlers_packageHandlers;
   "handlers/packageIdHandlers": typeof handlers_packageIdHandlers;
