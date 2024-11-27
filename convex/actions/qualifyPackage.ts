@@ -5,6 +5,7 @@ import { query, action, ActionCtx } from "../_generated/server";
 import { v } from "convex/values";
 import { checkForPackage } from "../queries/packageTable";
 import { uploadPackage } from "../mutations/uploadPackage";
+import { debloatBase64Package } from "../actions/packageUtils";
 
 // This action will:
 // 1. Validate that either content or URL has been passed.
