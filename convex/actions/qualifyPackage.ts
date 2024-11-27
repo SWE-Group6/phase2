@@ -1,23 +1,10 @@
+"use node";
+
 import { api } from "../_generated/api";
 import { query, action, ActionCtx } from "../_generated/server";
 import { v } from "convex/values";
 import { checkForPackage } from "../queries/packageTable";
 import { uploadPackage } from "../mutations/uploadPackage";
-
-// Schema that ensures either content or URL is provided, but not both.
-// If content is provided, name is required. 
-const packageUploadArgs = v.union(
-	v.object({
-		Content: v.string(),
-		Name: v.string(),
-		URL: v.optional(v.string()), // URL must not be set if content is given.
-	}),
-	v.object({
-		URL: v.string(),
-		Content: v.optional(v.string()), // Content must not be set if URL is given.
-		Name: v.optional(v.string()), // According to sample, only URL is given when passing URL.
-	})
-);
 
 // This action will:
 // 1. Validate that either content or URL has been passed.
@@ -26,7 +13,11 @@ const packageUploadArgs = v.union(
 // 4. Calculate package scores.
 // 5. Decide if data should be written.
 export const qualifyPackage = action({
-	args: packageUploadArgs,
+	args: {
+		Content: v.optional(v.string()),
+		Name: v.optional(v.string()),
+		URL: v.optional(v.string()),	
+	},
 	handler: async (ctx: ActionCtx, args) => {
 		if ('Content' in args && 'URL' in args) {
 			return {
@@ -71,7 +62,7 @@ export const qualifyPackage = action({
 			let packageID: String = await ctx.runMutation(api.mutations.uploadPackage.uploadPackage, {
 				packageName: Name,
 				packageVersion: Version,
-				Content,
+				Content: Content,
 			}); // return the uniqueID to package with all the other details.
 
 			return {
@@ -80,7 +71,7 @@ export const qualifyPackage = action({
 					packageName: Name,
 					packageVersion: Version,
 					packageID,
-					Content,
+					Content: Content,
 				}
 			};
 
@@ -88,6 +79,16 @@ export const qualifyPackage = action({
 		} else if ('URL' in args) { // proceed with 2-5.
 			const { URL } = args;
 			const Version = "1.0.0"; // TODO: Get package version via link.
+
+			if (!URL) {
+				return {
+					conflict: true,
+					metadata: {
+						message: "The provided link is invalid.",
+					},
+				};
+
+			}
 
 			const parts = URL.split('/');
 			let Name = parts[4];
