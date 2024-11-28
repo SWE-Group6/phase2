@@ -139,7 +139,7 @@ export const qualifyPackage = action({
 			}
 
 			// 1. Verify what link is it: NPM or GitHub.
-			
+			if (URL.includes('github.com')) {
 			// 2a. If GitHub link:
 				// Gather metrics.
 				// If package does not pass metrics test, abort.
@@ -148,6 +148,7 @@ export const qualifyPackage = action({
 				// Store: package name, package version, content, and URL. Use mutation to store and get back uniqueID.
 				// Return the uniqueID as well as package details.
 			
+			} else if (URL.includes('npmjs.com')) {
 			// 2b. If NPM link:
 				// Gather metrics.
 				// If package does not pass metrics test, abort.
@@ -155,7 +156,14 @@ export const qualifyPackage = action({
 				// Decode the package to get package name and package version from package.json.
 				// Store: package name, package version, content, and URL. Use mutation to store and get back uniqueID.
 				// Return the uniqueID as well as package details.
-			
+			} else {
+				return { 
+					conflict: true,
+					metadata: {
+						message: "The provided link is invalid.",
+					}
+				};
+			}
 		} else { // Something else was provided.
 			return { 
 				conflict: true,
