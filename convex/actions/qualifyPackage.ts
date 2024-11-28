@@ -5,7 +5,7 @@ import { query, action, ActionCtx } from "../_generated/server";
 import { v } from "convex/values";
 import { checkForPackage } from "../queries/packageTable";
 import { uploadPackage } from "../mutations/uploadPackage";
-import { debloatBase64Package } from "../actions/packageUtils";
+import { decodeBase64, unzipFile, findPackageJSON, extractVersionFromPackage, debloatBase64Package } from "../actions/packageUtils";
 
 // This action will:
 // 1. Validate that either content or URL has been passed.
@@ -30,13 +30,13 @@ export const qualifyPackage = action({
 			};
 		} else if ('Content' in args) { // proceed with 2-5.
 			const { Content, Name, Debloat } = args;
-			const Version = "1.0.0"; // TODO: Iterate through files, find package.json. Get version info from there as well as name.
-			
+
 			if (!Content) {
 				return {
 					conflict: true,
 					metadata: {
 						message: "Content must not be empty.",
+						code: 400,
 					}
 				};
 			}
@@ -46,8 +46,28 @@ export const qualifyPackage = action({
 					conflict: true,
 					metadata: {
 						message: "Name must be provided when passing content.",
+						code: 400,
 					},
 				};
+			}
+
+			// 1. Decode files.
+			const decodedFiles = decodeBase64(Content);
+
+			// 2. Unzip package.
+			const zip = unzipFile(decodedFiles);
+
+			// 2. Find package.json
+			const packageJSON = findPackageJSON(zip);
+
+			// 3. Extract version info from the version field.
+			let Version = "1.0.0"; // Default to 1.0.0 if version does not exist.
+
+			if (packageJSON) {
+				const extractedVersion = extractVersionFromPackage(packageJSON);
+				if (extractedVersion) {
+					Version = extractedVersion;
+				}
 			}
 
 			const packageExists = await ctx.runQuery(api.queries.packageTable.checkForPackage, {
@@ -62,14 +82,24 @@ export const qualifyPackage = action({
 						Name: Name,
 						Version: Version,
 						message: "Package already exists.",
+						code: 409,
 					}
 				};	
 			}
 
 			// Calculate package scores. 
-			
+			let packageScore = 0.0; // temp score as I try to figure out how to get the metrics.
 
 			// Decide if data should be written.
+			if (packageScore < 0.5) {
+				return {
+					conflict: true,
+					metadata: {
+						message: "Package failed to meet minimum requirements.",
+						code: 424,
+					},
+				}
+			}
 
 			// Debloat if flagged.
 			let processedContent = Content;
@@ -91,14 +121,13 @@ export const qualifyPackage = action({
 					packageVersion: Version,
 					packageID,
 					Content: processedContent,
+					code: 201,
 				}
 			};
 
 			
 		} else if ('URL' in args) { // proceed with 2-5.
 			const { URL } = args;
-			const Version = "1.0.0"; // TODO: Can get version from package.json file. How to download content from GitHub?
-
 			if (!URL) {
 				return {
 					conflict: true,
@@ -109,44 +138,30 @@ export const qualifyPackage = action({
 
 			}
 
-			const parts = URL.split('/');
-			let Name = parts[4];
-
-			if (!Name) {
-				return {
-					conflict: true,
-					metadata: {
-						message: "Couldn't get name from link provided.",
-					},
-				};
-			}
+			// 1. Verify what link is it: NPM or GitHub.
 			
-			const packageExists = await ctx.runQuery(api.queries.packageTable.checkForPackage, {
-				packageName: Name,
-				packageVersion: Version,
-			});
-
-			if (packageExists) { // package exists, so propogate the error code and display the package.
-				return {
-					conflict: true,
-					metadata: {
-						Name: Name,
-						Version: Version,
-						message: "Package already exists.",
-					}
-				};	
-			}
-
-			// Calculate package scores.
-			// Decide if data should be written.
-			// No need to debloat.
-			// Store data by calling mutation.
-
+			// 2a. If GitHub link:
+				// Gather metrics.
+				// If package does not pass metrics test, abort.
+				// Download package from GitHub as base64 encoded content.
+				// Decode the package to get package name and package version from package.json.
+				// Store: package name, package version, content, and URL. Use mutation to store and get back uniqueID.
+				// Return the uniqueID as well as package details.
+			
+			// 2b. If NPM link:
+				// Gather metrics.
+				// If package does not pass metrics test, abort.
+				// Download package from NPM as base64 encoded content.
+				// Decode the package to get package name and package version from package.json.
+				// Store: package name, package version, content, and URL. Use mutation to store and get back uniqueID.
+				// Return the uniqueID as well as package details.
+			
 		} else { // Something else was provided.
 			return { 
 				conflict: true,
 				metadata: {
 					message: "An unknown error occurred.",
+					code: 500,
 				},
 			};	
 		}	

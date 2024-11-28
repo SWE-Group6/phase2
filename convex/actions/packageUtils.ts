@@ -15,12 +15,12 @@ import AdmZip, { IZipEntry } from "adm-zip"; // https://www.npmjs.com/package/ad
 import { createHash } from "crypto"; 
 
 // a. begin by decoding the base64 content.
-function decodeBase64(base64String: string): Buffer {
+export function decodeBase64(base64String: string): Buffer {
 	return Buffer.from(base64String, "base64");
 }
 
 // b. unzip the package.
-function unzipFile(buffer: Buffer): AdmZip {
+export function unzipFile(buffer: Buffer): AdmZip {
 	const zip = new AdmZip(buffer);
 	return zip;
 }
@@ -139,4 +139,37 @@ export function debloatBase64Package(base64String: string): string {
 	const recompressedBuffer = recompressZip(zip);
 
 	return encodeToBase64(recompressedBuffer);
+}
+
+export function findPackageJson(zip: AdmZip): IZipEntry | null {
+  const entries = zip.getEntries();
+
+  for (const entry of entries) {
+    // We are looking for any file named 'package.json', regardless of its location.
+    if (entry.entryName.endsWith("package.json")) {
+      return entry; // Return the entry if found.
+    }
+  }
+
+  console.error("Could not find package.json in the zip file.");
+  return null; // Return null if package.json is not found.
+}
+
+export function extractVersionFromPackageJson(packageJsonEntry: IZipEntry): string | null {
+  if (!packageJsonEntry) {
+    return null; // Return null if package.json is not found.
+  }
+
+  // Read the content of package.json
+  const packageJsonContent = packageJsonEntry.getData().toString("utf-8");
+
+  try {
+    console.log("package.json content:", packageJsonContent); // Debugging log to see the content
+    // Parse JSON and extract the version field
+    const packageJson = JSON.parse(packageJsonContent);
+    return packageJson.version || null; // Return version if it exists.
+  } catch (error) {
+    console.error("Error parsing package.json:", error);
+    return null; // Return null if parsing fails.
+  }
 }
