@@ -9,9 +9,9 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 
 // project imports
 import { CssBaseline, styled, useTheme } from '@mui/material';
-import Header from '@/layout/MainLayout/Header';
-import Sidebar from '@/layout/MainLayout/Sidebar';
-import Customization from '@/layout/Customization';
+import Header from './Header';
+import Sidebar from './Sidebar';
+import Customization from '../Customization';
 import Breadcrumbs from '@/components/extended/Breadcrumbs';
 import { SET_MENU } from '@/store/actions';
 import { drawerWidth } from '@/store/constant';
@@ -20,9 +20,7 @@ import navigation from '@/menu-items'
 // assets
 import { IconChevronRight } from '@tabler/icons-react';
 
-import { useAuth } from '@clerk/clerk-react';
-
-const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }: {theme: any, open: any}) => ({
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' && prop !== 'theme' })(({ theme, open }: {theme: any, open: any}) => ({
   ...theme.typography.mainContent,
   borderBottomLeftRadius: 0,
   borderBottomRightRadius: 0,
@@ -55,10 +53,10 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({
   }
 }));
 
+// ==============================|| MAIN LAYOUT ||============================== //
 
-const Dashboard = () => {
-  const { isSignedIn } = useAuth();
-  const theme: any = useTheme();
+const MainLayout = () => {
+  const theme = useTheme();
   const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));
   // Handle left drawer
   const leftDrawerOpened = useSelector((state: any) => state.customization.opened);
@@ -66,33 +64,38 @@ const Dashboard = () => {
   const handleLeftDrawerToggle = () => {
     dispatch({ type: SET_MENU, opened: !leftDrawerOpened });
   };
-  
-    return (
-      <Box sx={{ display: 'flex' }}>
-        <CssBaseline />
-        {/* header */}
-        <AppBar
-          enableColorOnDark
-          position="fixed"
-          color="inherit"
-          elevation={0}
-          sx={{
-            bgcolor: theme.palette.background.default,
-            transition: leftDrawerOpened ? theme.transitions.create('width') : 'none'
-          }}
-        >
-          <Toolbar>
-            <Header handleLeftDrawerToggle={handleLeftDrawerToggle} />
-          </Toolbar>
-        </AppBar>
 
-        {/* drawer */}
-        <Sidebar drawerOpen={!matchDownMd ? leftDrawerOpened : !leftDrawerOpened} drawerToggle={handleLeftDrawerToggle} />
+  return (
+    <Box sx={{ display: 'flex' }}>
+      <CssBaseline />
+      {/* header */}
+      <AppBar
+        enableColorOnDark
+        position="fixed"
+        color="inherit"
+        elevation={0}
+        sx={{
+          bgcolor: theme.palette.background.default,
+          transition: leftDrawerOpened ? theme.transitions.create('width') : 'none'
+        }}
+      >
+        <Toolbar>
+          <Header handleLeftDrawerToggle={handleLeftDrawerToggle} />
+        </Toolbar>
+      </AppBar>
 
-        {/* main content */}
-     
-      </Box>
-    );
-  };
-  
-  export default Dashboard;
+      {/* drawer */}
+      <Sidebar drawerOpen={!matchDownMd ? leftDrawerOpened : !leftDrawerOpened} drawerToggle={handleLeftDrawerToggle} />
+
+      {/* main content */}
+      <Main theme={theme} open={leftDrawerOpened}>
+        {/* breadcrumb */}
+        <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
+        <Outlet />
+      </Main>
+      <Customization />
+    </Box>
+  );
+};
+
+export default MainLayout;
