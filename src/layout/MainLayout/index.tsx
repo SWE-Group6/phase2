@@ -6,12 +6,12 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import Customization from '../Customization';
 
 // project imports
 import { CssBaseline, styled, useTheme } from '@mui/material';
 import Header from './Header';
 import Sidebar from './Sidebar';
-import Customization from '../Customization';
 import Breadcrumbs from '@/components/extended/Breadcrumbs';
 import { SET_MENU } from '@/store/actions';
 import { drawerWidth } from '@/store/constant';
@@ -20,7 +20,7 @@ import navigation from '@/menu-items'
 // assets
 import { IconChevronRight } from '@tabler/icons-react';
 
-const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' && prop !== 'theme' })(({ theme, open }: {theme: any, open: any}) => ({
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open'})(({ theme, open }: {theme: any, open: any}) => ({
   ...theme.typography.mainContent,
   borderBottomLeftRadius: 0,
   borderBottomRightRadius: 0,
@@ -53,10 +53,10 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' && pr
   }
 }));
 
-// ==============================|| MAIN LAYOUT ||============================== //
+// ==============================|| MAIN LAYOUT ||============================== //xx
 
 const MainLayout = () => {
-  const theme = useTheme();
+  const theme: any = useTheme();
   const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));
   // Handle left drawer
   const leftDrawerOpened = useSelector((state: any) => state.customization.opened);
@@ -88,7 +88,7 @@ const MainLayout = () => {
       <Sidebar drawerOpen={!matchDownMd ? leftDrawerOpened : !leftDrawerOpened} drawerToggle={handleLeftDrawerToggle} />
 
       {/* main content */}
-      <Main theme={theme} open={leftDrawerOpened}>
+      <Main open={leftDrawerOpened} theme={undefined}>
         {/* breadcrumb */}
         <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
         <Outlet />

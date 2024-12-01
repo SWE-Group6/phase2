@@ -16,7 +16,7 @@ import themeTypography from './typography';
 export const theme = (customization: any) => {
   const color = colors;
 
-  const themeOption = {
+  const themeOption: any = {
     colors: color,
     heading: color.grey900,
     paper: color.paper,
@@ -45,11 +45,13 @@ export const theme = (customization: any) => {
     },
     typography: themeTypography(themeOption)
   };
-
-  const themes = createTheme(themeOptions);
-  themes.components = componentStyleOverrides(themeOption);
-
-  return themes;
+  const theme = createTheme({
+    ...themeOptions, // Spread the existing options
+    components: componentStyleOverrides(themeOption), // Apply the component overrides
+  });
+  return theme;
+  
+  
 };
 
 export default theme;
