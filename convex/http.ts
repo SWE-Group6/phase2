@@ -4,6 +4,7 @@ import { getPackageByIdHTTPHandler } from "./handlers/packageIdHandlers";
 import { getPackagesHTTPHandler } from "./handlers/packageHandlers";
 import { getPackageByRegexHTTPHandler } from "./handlers/packageByRegexHandlers";
 import { getTracksHTTPHandler } from "./handlers/trackHandlers";
+import { authenticateHandler } from "./handlers/authenticateHandler";
 
 const http = httpRouter();
 
@@ -37,6 +38,13 @@ http.route({
     path: "/tracks",
     method: "GET",
     handler: getTracksHTTPHandler,
+});
+
+// authenticate route
+http.route({
+    path: "/authenticate",
+    method: "PUT",
+    handler: authenticateHandler,
 });
 
 
