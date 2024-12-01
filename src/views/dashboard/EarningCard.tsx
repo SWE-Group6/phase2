@@ -16,7 +16,7 @@ import MainCard from '@/components/cards/MainCard';
 import SkeletonEarningCard from '@/components/cards/Skeleton/EarningCard'
 
 // assets
-import EarningIcon from '@/earning.svg';
+import EarningIcon from '@/assets/images/icons/npm.svg';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import GetAppTwoToneIcon from '@mui/icons-material/GetAppOutlined';
@@ -48,7 +48,7 @@ const EarningCard = ({ isLoading }: {isLoading: any}) => {
           border={false}
           content={false}
           sx={{
-            backgroundColor: theme.palette.secondary.dark,
+            backgroundColor: theme.palette.grey[700],
             color: '#fff',
             overflow: 'hidden',
             position: 'relative',
@@ -57,7 +57,7 @@ const EarningCard = ({ isLoading }: {isLoading: any}) => {
               position: 'absolute',
               width: 210,
               height: 210,
-              background: theme.palette.secondary[800],
+              background: theme.palette.grey[900],
               borderRadius: '50%',
               top: { xs: -105, sm: -85 },
               right: { xs: -140, sm: -95 }
@@ -67,7 +67,7 @@ const EarningCard = ({ isLoading }: {isLoading: any}) => {
               position: 'absolute',
               width: 210,
               height: 210,
-              background: theme.palette.secondary[800],
+              background: theme.palette.warning.dark,
               borderRadius: '50%',
               top: { xs: -155, sm: -125 },
               right: { xs: -70, sm: -15 },
@@ -85,11 +85,11 @@ const EarningCard = ({ isLoading }: {isLoading: any}) => {
                       sx={{
                         ...theme.typography.commonAvatar,
                         ...theme.typography.largeAvatar,
-                        bgcolor: 'secondary.800',
+                        bgcolor: '#364152',
                         mt: 1
                       }}
                     >
-                      <img src={EarningIcon} alt="Notification" />
+                      <img src={EarningIcon} alt="Notification"  style={{ width: '100%', height: '100%' }} />
                     </Avatar>
                   </Grid>
                   <Grid item>
@@ -98,8 +98,8 @@ const EarningCard = ({ isLoading }: {isLoading: any}) => {
                       sx={{
                         ...theme.typography.commonAvatar,
                         ...theme.typography.mediumAvatar,
-                        bgcolor: 'secondary.dark',
-                        color: 'secondary.200',
+                        bgcolor: '#364152',
+                        color: '#121926',
                         zIndex: 1
                       }}
                       aria-controls="menu-earning-card"
@@ -145,30 +145,7 @@ const EarningCard = ({ isLoading }: {isLoading: any}) => {
                   <Grid item>
                     <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>$500.00</Typography>
                   </Grid>
-                  <Grid item>
-                    <Avatar
-                      sx={{
-                        cursor: 'pointer',
-                        ...theme.typography.smallAvatar,
-                        bgcolor: 'secondary.200',
-                        color: 'secondary.dark'
-                      }}
-                    >
-                      <ArrowUpwardIcon fontSize="inherit" sx={{ transform: 'rotate3d(1, 1, 1, 45deg)' }} />
-                    </Avatar>
-                  </Grid>
                 </Grid>
-              </Grid>
-              <Grid item sx={{ mb: 1.25 }}>
-                <Typography
-                  sx={{
-                    fontSize: '1rem',
-                    fontWeight: 500,
-                    color: 'secondary.200'
-                  }}
-                >
-                  Total Earning
-                </Typography>
               </Grid>
             </Grid>
           </Box>

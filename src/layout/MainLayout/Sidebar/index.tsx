@@ -42,7 +42,6 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }: {drawerOpen: any, drawerT
           }}
         >
           <MenuList />
-          <MenuCard />
           <Stack direction="row" justifyContent="center" sx={{ mb: 2 }}>
             <Chip label={import.meta.env.VITE_APP_VERSION} disabled chipcolor="secondary" size="small" sx={{ cursor: 'pointer' }} />
           </Stack>
@@ -50,8 +49,7 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }: {drawerOpen: any, drawerT
       </BrowserView>
       <MobileView>
         <Box sx={{ px: 2 }}>
-          <MenuList />
-          <MenuCard />
+          
           <Stack direction="row" justifyContent="center" sx={{ mb: 2 }}>
             <Chip label={import.meta.env.VITE_APP_VERSION} disabled chipcolor="secondary" size="small" sx={{ cursor: 'pointer' }} />
           </Stack>

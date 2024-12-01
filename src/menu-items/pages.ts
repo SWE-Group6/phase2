@@ -1,38 +1,51 @@
 // assets
-import { IconKey } from '@tabler/icons-react';
+import { IconBrandReact } from '@tabler/icons-react';
 
 // constant
 const icons = {
-    IconKey
+    IconBrandReact
 };
 
 // ==============================|| EXTRA PAGES MENU ITEMS ||============================== //
 
 const pages = {
     id: 'pages',
-    title: 'Pages',
-    caption: 'Pages Caption',
+    title: 'Packages',
     type: 'group',
     children: [
         {
             id: 'authentication',
-            title: 'Authentication',
+            title: 'Actions',
             type: 'collapse',
-            icon: icons.IconKey,
+            icon: icons.IconBrandReact,
 
             children: [
                 {
                     id: 'login3',
-                    title: 'Login',
+                    title: 'Upload',
                     type: 'item',
-                    url: '/pages/login/login3',
+                    url: '/dashboard',
                     target: true
                 },
                 {
                     id: 'register3',
-                    title: 'Register',
+                    title: 'Delete',
                     type: 'item',
-                    url: '/pages/register/register3',
+                    url: '/dashboard',
+                    target: true
+                },
+                {
+                    id: 'login3',
+                    title: 'Rate',
+                    type: 'item',
+                    url: '/dashboard',
+                    target: true
+                },
+                {
+                    id: 'register3',
+                    title: 'Reset',
+                    type: 'item',
+                    url: '/dashboard',
                     target: true
                 }
             ]
