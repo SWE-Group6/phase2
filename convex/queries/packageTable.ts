@@ -110,3 +110,32 @@ export const checkForPackage = query({
 		       return result !== null;
 	},
 });
+
+// This query will:
+// This query will:
+// 1. Return package and version name.
+export const getPackageAndVersion = query({
+    args: {
+        packageName: v.string(),
+        packageVersion: v.string(),
+    },
+    handler: async (ctx, args) => {
+        const result = await ctx.db.query("packageTable")
+            .filter((q) =>
+                q.and(
+                    q.eq(q.field("metadata.Name"), args.packageName),
+                    q.eq(q.field("metadata.Version"), args.packageVersion)
+                )
+            )
+            .first();
+
+        // If no result is found, throw an error or return an appropriate response
+        if (result === null) {
+            throw new Error(`Package with name ${args.packageName} and version ${args.packageVersion} not found.`);
+        }
+
+        const { Name, Version } = result.metadata;
+
+        return { Name, Version };
+    },
+});

@@ -6,7 +6,7 @@ import { v } from "convex/values";
 import { AllMetrics } from "../package_rate/Models/AllMetrics";
 import { checkForPackage } from "../queries/packageTable";
 import { uploadPackage } from "../mutations/uploadPackage";
-import { decodeBase64, unzipFile, findPackageJSON, extractVersionFromPackage, debloatBase64Package, getRepoInfo, downloadPackage } from "../actions/packageUtils";
+import { decodeBase64, unzipFile, findPackageJson, extractVersionFromPackage, debloatBase64Package, getRepoInfo, downloadPackage } from "../actions/packageUtils";
 
 // This action will:
 // 1. Validate that either content or URL has been passed.
@@ -21,8 +21,8 @@ export const qualifyPackage = action({
 		URL: v.optional(v.string()),	
 		Debloat: v.optional(v.boolean()),
 	},
-	handler: async (ctx: ActionCtx, args) => {
-		if ('Content' in args && 'URL' in args) {
+    handler: async (ctx: ActionCtx, args) => {
+        if ('Content' in args && 'URL' in args) {
 			return {
 				conflict: true,
 				metadata: {
@@ -59,7 +59,7 @@ export const qualifyPackage = action({
 			const zip = unzipFile(decodedFiles);
 
 			// 2. Find package.json
-			const packageJSON = findPackageJSON(zip);
+			const packageJSON = findPackageJson(zip);
 
 			// 3. Extract version info from the version field.
 			let Version = "1.0.0"; // Default to 1.0.0 if version does not exist.
@@ -125,8 +125,6 @@ export const qualifyPackage = action({
 					code: 201,
 				}
 			};
-
-			
 		} else if ('URL' in args) { // proceed with 2-5.
 			const { URL } = args;
 			if (!URL) {
@@ -134,7 +132,7 @@ export const qualifyPackage = action({
 					conflict: true,
 					metadata: {
 						message: "The provided link is invalid.",
-						code: 500;
+						code: 500,
 					},
 				};
 
@@ -176,13 +174,13 @@ export const qualifyPackage = action({
 					// Decode package to get name, version from package.json
 					const decodedContent = decodeBase64(base64Content);
 					const unzippedFile = unzipFile(decodedContent);
-					const packageJSON = findPackageJSON(unzippedFile);
+					const packageJSON = findPackageJson(unzippedFile);
 
 					let packageName = "unknown";
 					let packageVersion = "1.0.0";
 
 					if (packageJSON) {
-						const extractedVersion = extractVersionFromPackageJson(packageJSON);
+						const extractedVersion = extractVersionFromPackage(packageJSON);
 						if (extractedVersion) {
 							packageVersion = extractedVersion;
 						}
@@ -190,10 +188,10 @@ export const qualifyPackage = action({
 					}
 
 					let packageID: string = await ctx.runMutation(api.mutations.uploadPackage.uploadPackage, {
-		packageName, 
-		packageVersion,
-		Content: base64Content,
-		URL
+                        packageName, 
+		                packageVersion,
+		                Content: base64Content,
+		                URL,
 					});
 
 					// Return the unique ID as well as package details.
@@ -212,8 +210,8 @@ export const qualifyPackage = action({
 						console.error("Could not get package files:", error);
 					} else {
 						console.error("An unknown error occurred:", error);
+                    }
 				}
-
 		} else { // Something else was provided.
 			return { 
 				conflict: true,
@@ -223,5 +221,7 @@ export const qualifyPackage = action({
 				},
 			};	
 		}	
-	},
+	
+    }
+    },
 });

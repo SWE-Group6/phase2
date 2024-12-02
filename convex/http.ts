@@ -42,13 +42,13 @@ http.route({
 });
 
 http.route({
-	path: "/",
+	path: "/upload_package",
 	method: "POST",
 	handler: uploadPackageHandler,
 });
 
 http.route({
-	path: "/", // TODO update path accordingly.
+	path: "/update_package", // TODO update path accordingly.
 	method: "POST",
 	handler: updatePackageHandler,
 });

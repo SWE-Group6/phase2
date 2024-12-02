@@ -1,8 +1,9 @@
 "use node";
 
-import { action, ActionCtx } from "../_generated/server";
+import { api } from "../_generated/api";
+import { query, action, ActionCtx } from "../_generated/server";
 import { v } from "convex/values";
-import { checkForPackage } from "../queries/packageTable";
+import { checkForPackage, getPackageAndVersion } from "../queries/packageTable";
 import { uploadPackage } from "../mutations/uploadPackage";
 import { debloatBase64Package, getRepoInfo, downloadPackage } from "../actions/packageUtils";
 
@@ -21,7 +22,7 @@ export const updatePackage = action({
 			return { 
 				conflict: true,
 				metadata: {
-					message: "Cannot provide both content and URL";
+					message: "Cannot provide both content and URL",
 					code: 400,
 				},
 			};
@@ -38,9 +39,9 @@ export const updatePackage = action({
 			}		
 
 			// 1. Run a query to see if version passed thru args is greater than version already in database.
-			const currentPackage = await ctx.runQuery(api.queries.packageTable.checkForPackage, {
-				Name,
-				Version,
+			const currentPackage = await ctx.runQuery(api.queries.packageTable.getPackageAndVersion, {
+				packageName: Name,
+				packageVersion: Version,
 			});
 
 			if (!currentPackage) {
@@ -53,7 +54,7 @@ export const updatePackage = action({
 				};
 			}
 
-			if (Version <= currentPackage.metadata.Version) {
+			if (Version <= currentPackage.Version) {
 				return {
 					conflict: true,
 					metadata: {
@@ -66,11 +67,11 @@ export const updatePackage = action({
 			// 2. If so, check debloat flag --> debloat package if true.
 			let processedContent = Content;
 			if (Debloat) {
-				processedContent = debloatBase64Content(Content);
+				processedContent = debloatBase64Package(Content);
 			}
 
 			// 3. Run mutation to upload to database.
-			const updatedPackageID = await runMutation(api.mutations.uploadPackage.uploadPackage, {
+			const updatedPackageID = await ctx.runMutation(api.mutations.uploadPackage.uploadPackage, {
 				packageName: Name, 
 				packageVersion: Version,
 				Content: processedContent,
@@ -97,27 +98,30 @@ export const updatePackage = action({
 			}
 
 			// 1. Get version information from the provided URL.
-			const currentPackage = await ctx.runQuery(api.queries.packageTable.getPackageByID, { ID });
+			const currentPackage = await ctx.runQuery(api.queries.packageTable.getPackageAndVersion, {
+                packageName: Name,
+                packageVersion: Version,
+            });
 
-            		if (!currentPackage) {
-                		return {
-                    			conflict: true,
-                    			metadata: {
-                        			message: "Package not found in the database.",
-                        			code: 404,
-                    			},
-                		};
-            		}
+            if (!currentPackage) {
+                return {
+                    conflict: true,
+                    metadata: { 
+                        message: "Package not found in the database.",
+                        code: 404,
+                    },
+                };
+            }
 
-            		if (Version <= currentPackage.metadata.Version) {
-                		return {
-                    			conflict: true,
-                    			metadata: {
-                        			message: "The provided version must be greater than the current version.",
-                        			code: 400,
-                    			},
-                		};
-            		}
+            if (Version <= currentPackage.Version) {
+                return {
+                    conflict: true,
+                    metadata: {
+                        message: "The provided version must be greater than the current version.",
+                        code: 400,
+                    },
+                };
+            }
 
 			// Safe to proceed with upload.
 			const repoInfo = await getRepoInfo(URL);

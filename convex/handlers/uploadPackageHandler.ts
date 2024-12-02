@@ -22,6 +22,13 @@ export const uploadPackageHandler = httpAction(async (ctx, request) => {
 			Debloat,
 		});
 
+        if (!result) {
+            return new Response(
+                JSON.stringify({ error: "Couldn't upload package successfully:", Error }),
+                { status: 500 },
+            );
+        }
+
 		// Check the result for conflict or success.
         	if (result.conflict) {
             		return new Response(
@@ -42,13 +49,10 @@ export const uploadPackageHandler = httpAction(async (ctx, request) => {
             		{ status: result.metadata.code || 201 } // Created or appropriate success code.
         	);
 	} catch (error) {
-		if (error instanceof Error) {
-			return new Response(
-				JSON.stringify({ error: "Internal Server Error" }),
-				{ status: 500 }
-			);
-		} else {
-			console.error("An unknown error occurred:", error);
-		}
+        console.error("An unexpected error occurred:", error);
+        return new Response(
+            JSON.stringify({ error: "Internal Server Error" }),
+            { status: 500 }
+        );
 	}	
-}
+});

@@ -156,7 +156,7 @@ export function findPackageJson(zip: AdmZip): IZipEntry | null {
   return null; // Return null if package.json is not found.
 }
 
-export function extractVersionFromPackageJson(packageJsonEntry: IZipEntry): string | null {
+export function extractVersionFromPackage(packageJsonEntry: IZipEntry): string | null {
   if (!packageJsonEntry) {
     return null; // Return null if package.json is not found.
   }
@@ -175,7 +175,7 @@ export function extractVersionFromPackageJson(packageJsonEntry: IZipEntry): stri
   }
 }
 
-export async function getRepoInfo(URL: string): Promise< { owner: string, repo: string }> | null {
+export async function getRepoInfo(URL: string): Promise< { owner: string, repo: string } | null> {
 	if (URL.includes('github.com')) {
 		const parts = URL.split('/');
 		const owner = parts[3];
