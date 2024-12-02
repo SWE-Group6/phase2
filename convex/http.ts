@@ -4,6 +4,8 @@ import { getPackageByIdHTTPHandler } from "./handlers/packageIdHandlers";
 import { getPackagesHTTPHandler } from "./handlers/packageHandlers";
 import { getPackageByRegexHTTPHandler } from "./handlers/packageByRegexHandlers";
 import { getTracksHTTPHandler } from "./handlers/trackHandlers";
+import { uploadPackageHandler } from "./handlers/uploadPackageHandler";
+import { updatePackageHandler } from "./handlers/updatePackageHandler";
 
 const http = httpRouter();
 
@@ -39,5 +41,16 @@ http.route({
     handler: getTracksHTTPHandler,
 });
 
+http.route({
+	path: "/",
+	method: "POST",
+	handler: uploadPackageHandler,
+});
+
+http.route({
+	path: "/", // TODO update path accordingly.
+	method: "POST",
+	handler: updatePackageHandler,
+});
 
 export default http;

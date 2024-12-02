@@ -3,9 +3,10 @@
 import { api } from "../_generated/api";
 import { query, action, ActionCtx } from "../_generated/server";
 import { v } from "convex/values";
+import { AllMetrics } from "../package_rate/Models/AllMetrics";
 import { checkForPackage } from "../queries/packageTable";
 import { uploadPackage } from "../mutations/uploadPackage";
-import { decodeBase64, unzipFile, findPackageJSON, extractVersionFromPackage, debloatBase64Package } from "../actions/packageUtils";
+import { decodeBase64, unzipFile, findPackageJSON, extractVersionFromPackage, debloatBase64Package, getRepoInfo, downloadPackage } from "../actions/packageUtils";
 
 // This action will:
 // 1. Validate that either content or URL has been passed.
@@ -133,37 +134,86 @@ export const qualifyPackage = action({
 					conflict: true,
 					metadata: {
 						message: "The provided link is invalid.",
+						code: 500;
 					},
 				};
 
 			}
 
-			// 1. Verify what link is it: NPM or GitHub.
-			if (URL.includes('github.com')) {
-			// 2a. If GitHub link:
-				// Gather metrics.
-				// If package does not pass metrics test, abort.
-				// Download package from GitHub as base64 encoded content.
-				// Decode the package to get package name and package version from package.json.
-				// Store: package name, package version, content, and URL. Use mutation to store and get back uniqueID.
-				// Return the uniqueID as well as package details.
-			
-			} else if (URL.includes('npmjs.com')) {
-			// 2b. If NPM link:
-				// Gather metrics.
-				// If package does not pass metrics test, abort.
-				// Download package from NPM as base64 encoded content.
-				// Decode the package to get package name and package version from package.json.
-				// Store: package name, package version, content, and URL. Use mutation to store and get back uniqueID.
-				// Return the uniqueID as well as package details.
-			} else {
-				return { 
-					conflict: true,
-					metadata: {
-						message: "The provided link is invalid.",
+			if (URL.includes('github.com') || URL.includes('npmjs.com')) { // Reject if it's neither from GitHub or npm.
+				// Gather metrics first. If it doesn't qualify, reject.
+				const metrics = new AllMetrics(URL);
+				let base64Content = "";
+
+				const packageScore = await metrics.calculateNetScore();
+
+				if (packageScore < 0.5) {
+					return {
+						conflict: true, 
+						metadata: {
+							message: "Package failed to meet minimum requirements on one or more metric.",
+							code: 424,
+						}
+					};
+				} // Continue otherwise.
+
+				let repoInfo = await getRepoInfo(URL); // Download from GitHub as base64 encoded content.
+				if (!repoInfo) {
+					return {
+						conflict: true,
+						metadata: {
+							message: "Could not determine repo info from the URL",
+							code: 400,
+						}
+					};
+				}
+
+				const { owner, repo } = repoInfo;
+
+				try {
+					base64Content = await downloadPackage(owner, repo);
+
+					// Decode package to get name, version from package.json
+					const decodedContent = decodeBase64(base64Content);
+					const unzippedFile = unzipFile(decodedContent);
+					const packageJSON = findPackageJSON(unzippedFile);
+
+					let packageName = "unknown";
+					let packageVersion = "1.0.0";
+
+					if (packageJSON) {
+						const extractedVersion = extractVersionFromPackageJson(packageJSON);
+						if (extractedVersion) {
+							packageVersion = extractedVersion;
+						}
+						packageName = repo;
 					}
-				};
-			}
+
+					let packageID: string = await ctx.runMutation(api.mutations.uploadPackage.uploadPackage, {
+		packageName, 
+		packageVersion,
+		Content: base64Content,
+		URL
+					});
+
+					// Return the unique ID as well as package details.
+					return {
+						conflict: false,
+						metadata: {
+							packageName,
+							packageVersion,
+							URL, 
+							Content: base64Content,
+							code: 201,
+						}
+					};
+				} catch (error) {
+					if (error instanceof Error) {
+						console.error("Could not get package files:", error);
+					} else {
+						console.error("An unknown error occurred:", error);
+				}
+
 		} else { // Something else was provided.
 			return { 
 				conflict: true,

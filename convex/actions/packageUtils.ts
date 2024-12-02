@@ -13,6 +13,7 @@
 import { Buffer } from "buffer";
 import AdmZip, { IZipEntry } from "adm-zip"; // https://www.npmjs.com/package/adm-zip
 import { createHash } from "crypto"; 
+import axios from 'axios';
 
 // a. begin by decoding the base64 content.
 export function decodeBase64(base64String: string): Buffer {
@@ -173,3 +174,29 @@ export function extractVersionFromPackageJson(packageJsonEntry: IZipEntry): stri
     return null; // Return null if parsing fails.
   }
 }
+
+export async function getRepoInfo(URL: string): Promise< { owner: string, repo: string }> | null {
+	if (URL.includes('github.com')) {
+		const parts = URL.split('/');
+		const owner = parts[3];
+		const repo = parts[4].replace(/\.git$/, ""); // Remove the .git if present.
+		return { owner, repo };
+	} else if (URL.includes('npmjs.com')) {
+		const packageName = URL.split('/').pop();
+		const response = await axios.get(`https://registry.npmjs.org/${packageName}`); // TODO work with npm api for certain packages.
+		const repositoryURL = response.data.repository?.url;
+
+		if (repositoryURL && repositoryURL.includes('github.com')) {
+			return getRepoInfo(repositoryURL);
+		}
+	}
+
+	return null; // If not a valid URL type.
+}
+
+export async function downloadPackage(owner: string, repo: string, branch: string = "main"): Promise<string> {
+	const zipURL = `https://github.com/${owner}/${repo}/archive/refs/heads/${branch}.zip`;
+	const response = await axios.get(zipURL, { responseType: 'arraybuffer' });
+	return Buffer.from(response.data, 'binary').toString('base64');
+}
+
