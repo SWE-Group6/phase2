@@ -9,7 +9,6 @@ import ButtonBase from '@mui/material/ButtonBase';
 // project imports
 import LogoSection from '../LogoSection';
 import SearchSection from './SearchSection';
-import NotificationSection from './NotificationSection';
 import ProfileSection from './ProfileSection';
 
 // assets
@@ -62,8 +61,7 @@ const Header = ({ handleLeftDrawerToggle }: {handleLeftDrawerToggle: any}) => {
       <Box sx={{ flexGrow: 1 }} />
       <Box sx={{ flexGrow: 1 }} />
 
-      {/* notification & profile */}
-      <NotificationSection />
+      {/* profile */}
       <ProfileSection />
     </>
   );
