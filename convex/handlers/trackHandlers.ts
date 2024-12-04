@@ -4,7 +4,7 @@ import { httpAction } from "../_generated/server";
 export const getTracksHTTPHandler = httpAction(async (ctx, request) => {
     const tracks = {
         "plannedTracks": [
-            "Auth Track",
+            "Access control track",
         ]
     }
       return new Response(JSON.stringify(tracks), { status: 200 });
