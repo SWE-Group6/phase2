@@ -15,22 +15,25 @@ import { decodeBase64, unzipFile, findPackageJson, extractVersionFromPackage, de
 // 4. Calculate package scores.
 // 5. Decide if data should be written.
 export const qualifyPackage = action({
+    // TODO change args to union 
+    // TODO Call ratePackage for link
 	args: {
-		Content: v.optional(v.string()),
-		Name: v.optional(v.string()),
-		URL: v.optional(v.string()),	
-		Debloat: v.optional(v.boolean()),
+        Data: v.union(
+            v.object({
+                Content: v.string(),
+                JSProgram: v.string(),
+                Debloat: v.boolean(),
+                Name: v.string(),
+            }),
+            v.object({
+                URL: v.string(),
+                JSProgram: v.string(),
+            }),
+        )
 	},
     handler: async (ctx: ActionCtx, args) => {
-        if ('Content' in args && 'URL' in args) {
-			return {
-				conflict: true,
-				metadata: {
-					message: "Cannot provide both content and URL",
-				},
-			};
-		} else if ('Content' in args) { // proceed with 2-5.
-			const { Content, Name, Debloat } = args;
+        if ('Content' in args.Data) { // proceed with 2-5.
+			const { Content, JSProgram, Debloat, Name } = args.Data;
 
 			if (!Content) {
 				return {
@@ -88,6 +91,7 @@ export const qualifyPackage = action({
 				};	
 			}
 
+            /*
 			// Calculate package scores. 
 			let packageScore = 0.0; // temp score as I try to figure out how to get the metrics.
 
@@ -101,6 +105,7 @@ export const qualifyPackage = action({
 					},
 				}
 			}
+            */
 
 			// Debloat if flagged.
 			let processedContent = Content;
@@ -125,8 +130,8 @@ export const qualifyPackage = action({
 					code: 201,
 				}
 			};
-		} else if ('URL' in args) { // proceed with 2-5.
-			const { URL } = args;
+		} else if ('URL' in args.Data) { // proceed with 2-5.
+			const { URL, JSProgram } = args.Data;
 			if (!URL) {
 				return {
 					conflict: true,

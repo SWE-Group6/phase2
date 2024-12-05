@@ -8,6 +8,7 @@ import { uploadPackage } from "../mutations/uploadPackage";
 import { debloatBase64Package, getRepoInfo, downloadPackage } from "../actions/packageUtils";
 
 // TODO Should metrics be ran here?
+// TODO call query for ID 
 export const updatePackage = action({
 	args: {
 		Name: v.string(),
