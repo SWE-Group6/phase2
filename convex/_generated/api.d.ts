@@ -13,13 +13,19 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as actions_packageUtils from "../actions/packageUtils.js";
+import type * as actions_qualifyPackage from "../actions/qualifyPackage.js";
+import type * as actions_updatePackage from "../actions/updatePackage.js";
 import type * as handlers_authenticateHandler from "../handlers/authenticateHandler.js";
 import type * as handlers_packageByRegexHandlers from "../handlers/packageByRegexHandlers.js";
 import type * as handlers_packageHandlers from "../handlers/packageHandlers.js";
 import type * as handlers_packageIdHandlers from "../handlers/packageIdHandlers.js";
 import type * as handlers_trackHandlers from "../handlers/trackHandlers.js";
 import type * as handlers_trial from "../handlers/trial.js";
+import type * as handlers_updatePackageHandler from "../handlers/updatePackageHandler.js";
+import type * as handlers_uploadPackageHandler from "../handlers/uploadPackageHandler.js";
 import type * as http from "../http.js";
+import type * as mutations_uploadPackage from "../mutations/uploadPackage.js";
 import type * as myFunctions from "../myFunctions.js";
 import type * as package_rate_Models_AllMetrics from "../package_rate/Models/AllMetrics.js";
 import type * as package_rate_Models_BusFactor from "../package_rate/Models/BusFactor.js";
@@ -42,13 +48,20 @@ import type * as queries_packageTable from "../queries/packageTable.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  "actions/packageUtils": typeof actions_packageUtils;
+  "actions/qualifyPackage": typeof actions_qualifyPackage;
+  "actions/updatePackage": typeof actions_updatePackage;
   "handlers/authenticateHandler": typeof handlers_authenticateHandler;
   "handlers/packageByRegexHandlers": typeof handlers_packageByRegexHandlers;
   "handlers/packageHandlers": typeof handlers_packageHandlers;
   "handlers/packageIdHandlers": typeof handlers_packageIdHandlers;
   "handlers/trackHandlers": typeof handlers_trackHandlers;
   "handlers/trial": typeof handlers_trial;
+  "handlers/updatePackageHandler": typeof handlers_updatePackageHandler;
+  "handlers/uploadPackageHandler": typeof handlers_uploadPackageHandler;
   http: typeof http;
+
+  "mutations/uploadPackage": typeof mutations_uploadPackage;
   myFunctions: typeof myFunctions;
   "package_rate/Models/AllMetrics": typeof package_rate_Models_AllMetrics;
   "package_rate/Models/BusFactor": typeof package_rate_Models_BusFactor;
