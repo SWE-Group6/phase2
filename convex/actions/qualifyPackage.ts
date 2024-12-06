@@ -6,7 +6,8 @@ import { v } from "convex/values";
 import { AllMetrics } from "../package_rate/Models/AllMetrics";
 import { checkForPackage } from "../queries/packageTable";
 import { uploadPackage } from "../mutations/uploadPackage";
-import { decodeBase64, unzipFile, findPackageJson, extractVersionFromPackage, debloatBase64Package, getRepoInfo, downloadPackage } from "../actions/packageUtils";
+import { decodeBase64, unzipFile, findPackageJson, extractVersionFromPackage, debloatBase64Package, getRepoInfo, downloadPackage, downloadPackageBlob, base64ToBlob } from "../actions/packageUtils";
+import { decode } from "punycode";
 
 // This action will:
 // 1. Validate that either content or URL has been passed.
@@ -91,45 +92,28 @@ export const qualifyPackage = action({
 				};	
 			}
 
-            /*
-			// Calculate package scores. 
-			let packageScore = 0.0; // temp score as I try to figure out how to get the metrics.
-
-			// Decide if data should be written.
-			if (packageScore < 0.5) {
-				return {
-					conflict: true,
-					metadata: {
-						message: "Package failed to meet minimum requirements.",
-						code: 424,
-					},
-				}
-			}
-            */
-
 			// Debloat if flagged.
 			let processedContent = Content;
+			let blob = base64ToBlob(Content);
 			if (Debloat === true) {
 				processedContent = await debloatBase64Package(Content);
+				blob = base64ToBlob(processedContent);
+				
 			}
 
+			//convert the zip into blob and upload it to storage
+			const storageId = await ctx.storage.store(blob); 
+			
 			// Store data by calling mutation.
 			let packageID: String = await ctx.runMutation(api.mutations.uploadPackage.uploadPackage, {
 				packageName: Name,
 				packageVersion: Version,
-				Content: processedContent,
+				Content: storageId,
 			}); // return the uniqueID to package with all the other details.
 
-			return {
-				conflict: false,
-				metadata: {
-					packageName: Name,
-					packageVersion: Version,
-					packageID,
-					Content: processedContent,
-					code: 201,
-				}
-			};
+			const packageData: any = await ctx.runQuery(api.queries.packageTable.getPackageById, { packageId: packageID });
+			console.log("Package data for Content Only:", packageData);
+			return packageData;
 		} else if ('URL' in args.Data) { // proceed with 2-5.
 			const { URL, JSProgram } = args.Data;
 			if (!URL) {
@@ -145,20 +129,20 @@ export const qualifyPackage = action({
 
 			if (URL.includes('github.com') || URL.includes('npmjs.com')) { // Reject if it's neither from GitHub or npm.
 				// Gather metrics first. If it doesn't qualify, reject.
-				const metrics = new AllMetrics(URL);
+				// const metrics = new AllMetrics(URL);
 				let base64Content = "";
 
-				const packageScore = await metrics.calculateNetScore();
+				// const packageScore = await metrics.calculateNetScore();
 
-				if (packageScore < 0.5) {
-					return {
-						conflict: true, 
-						metadata: {
-							message: "Package failed to meet minimum requirements on one or more metric.",
-							code: 424,
-						}
-					};
-				} // Continue otherwise.
+				// if (packageScore < 0.5) {
+				// 	return {
+				// 		conflict: true, 
+				// 		metadata: {
+				// 			message: "Package failed to meet minimum requirements on one or more metric.",
+				// 			code: 424,
+				// 		}
+				// 	};
+				// } // Continue otherwise.
 
 				let repoInfo = await getRepoInfo(URL); // Download from GitHub as base64 encoded content.
 				if (!repoInfo) {
@@ -191,25 +175,23 @@ export const qualifyPackage = action({
 						}
 						packageName = repo;
 					}
+					console.log("Package name:", packageName);
+					const zipBlob = await downloadPackageBlob(owner, repo);
+					console.log("Blob ran");
+					const storageId = await ctx.storage.store(zipBlob);
+
 
 					let packageID: string = await ctx.runMutation(api.mutations.uploadPackage.uploadPackage, {
                         packageName, 
 		                packageVersion,
-		                Content: base64Content,
+		                Content: storageId,
 		                URL,
 					});
 
-					// Return the unique ID as well as package details.
-					return {
-						conflict: false,
-						metadata: {
-							packageName,
-							packageVersion,
-							URL, 
-							Content: base64Content,
-							code: 201,
-						}
-					};
+					//call the packageId Query using runQuery to get the packageID
+					const packageData: any = await ctx.runQuery(api.queries.packageTable.getPackageById, { packageId: packageID });
+					console.log("Package data:", packageData);
+					return packageData;
 				} catch (error) {
 					if (error instanceof Error) {
 						console.error("Could not get package files:", error);

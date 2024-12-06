@@ -194,9 +194,49 @@ export async function getRepoInfo(URL: string): Promise< { owner: string, repo: 
 	return null; // If not a valid URL type.
 }
 
-export async function downloadPackage(owner: string, repo: string, branch: string = "main"): Promise<string> {
-	const zipURL = `https://github.com/${owner}/${repo}/archive/refs/heads/${branch}.zip`;
-	const response = await axios.get(zipURL, { responseType: 'arraybuffer' });
-	return Buffer.from(response.data, 'binary').toString('base64');
+export async function downloadPackage(owner: string, repo: string): Promise<string> {
+	const response = await axios.get(`https://api.github.com/repos/${owner}/${repo}`);
+	const defaultBranch = response.data.default_branch;
+	const zipURL = `https://github.com/${owner}/${repo}/archive/refs/heads/${defaultBranch}.zip`;
+	const zipResonse = await axios.get(zipURL, { responseType: 'arraybuffer' });
+	return Buffer.from(zipResonse.data, 'binary').toString('base64');
 }
 
+export async function downloadPackageBlob(owner: string, repo: string): Promise<Blob> {
+	// Step 1: Get the default branch of the repository
+	const response = await axios.get(`https://api.github.com/repos/${owner}/${repo}`);
+	const defaultBranch = response.data.default_branch;
+  
+	// Step 2: Construct the URL for the zip file
+	const zipURL = `https://github.com/${owner}/${repo}/archive/refs/heads/${defaultBranch}.zip`;
+  
+	console.log("Downloading package from:", zipURL);
+	// Step 3: Fetch the zip file as an array buffer
+	const zipResponse = await axios.get(zipURL, { responseType: "arraybuffer" });
+  
+	// Step 4: Convert the array buffer to a Blob
+	const zipBlob = new Blob([zipResponse.data], { type: "application/zip" });
+  
+	return zipBlob; // Return the Blob
+  }
+  
+export function base64ToBlob(base64: string, mimeType: string = 'application/zip'): Blob {
+	// Remove the data URL prefix if present
+	const base64Clean = base64.replace(/^data:.*\/.*;base64,/, '');
+	
+	// Decode the base64 string to binary
+	const byteCharacters = atob(base64Clean);
+	
+	// Convert binary string to byte array
+	const byteNumbers = new Array(byteCharacters.length);
+	for (let i = 0; i < byteCharacters.length; i++) {
+	  byteNumbers[i] = byteCharacters.charCodeAt(i);
+	}
+	
+	// Create Uint8Array from byte numbers
+	const byteArray = new Uint8Array(byteNumbers);
+	
+	// Create and return Blob
+	return new Blob([byteArray], { type: mimeType });
+  }
+  

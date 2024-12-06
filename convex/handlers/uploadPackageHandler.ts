@@ -7,7 +7,11 @@ export const uploadPackageHandler = httpAction(async (ctx, request) => {
 		const body = await request.json();
 		
 		const { Content, URL, JSProgram, Debloat, Name} = body;
-		
+        console.log('Content:', Content);
+        console.log('URL:', URL);
+        console.log('JSProgram:', JSProgram);
+        console.log('Debloat:', Debloat);
+
 		if ((Content && URL) || (!Content && !URL)) {
 			return new Response(
 				JSON.stringify({ error: "Provide either content or URL, but not both" }),
@@ -45,20 +49,16 @@ export const uploadPackageHandler = httpAction(async (ctx, request) => {
         if (result.conflict) {
             return new Response(
                 JSON.stringify({
-                    error: result.metadata.message,
-                        metadata: result.metadata,
+                    error: result.metadata.message
                 	}),
                 	{ status: result.metadata.code || 400 } // Use code from the response or default to 400.
                 );
         }
-
+        console.log('Result:', result);
         // If there's no conflict, return the success response.
         return new Response(
-            JSON.stringify({
-                message: "Package uploaded successfully.",
-                metadata: result.metadata,
-            }),
-            { status: result.metadata.code || 201 } // Created or appropriate success code.
+            JSON.stringify(result),
+            { status:  201 } // Created or appropriate success code.
         );
 	} catch (error) {
         console.error("Error in uploadPackageHandler:", error); // Log the error for debugging

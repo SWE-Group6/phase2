@@ -19,6 +19,7 @@ export default defineSchema(
           JSProgram: v.string(), // Optional JavaScript program (for sensitive modules)
         }),
         v.object({
+          Content: v.string(), // Base64 encoded zip file content
           URL: v.string(), // URL for public ingestion
           JSProgram: v.string(), // Optional JavaScript program (for sensitive modules)
         })
