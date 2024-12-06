@@ -6,6 +6,8 @@ import { getPackageByRegexHTTPHandler } from "./handlers/packageByRegexHandlers"
 import { getTracksHTTPHandler } from "./handlers/trackHandlers";
 import { uploadPackageHandler } from "./handlers/uploadPackageHandler";
 import { updatePackageHandler } from "./handlers/updatePackageHandler";
+import { authenticateHandler } from "./handlers/authenticateHandler";
+
 
 const http = httpRouter();
 
@@ -52,5 +54,12 @@ http.route({
 	method: "POST",
 	handler: updatePackageHandler,
 });
+// authenticate route
+http.route({
+    path: "/authenticate",
+    method: "PUT",
+    handler: authenticateHandler,
+});
+
 
 export default http;

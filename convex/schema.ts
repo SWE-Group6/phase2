@@ -25,18 +25,15 @@ export default defineSchema(
         })
       ),
     }),
-
-    packageScores: defineTable({
-    	Name: v.string(),
-    	Version: v.string(),
-    	BusFactorScore: v.float64(),
-    	CorrectnessScore: v.float64(),
-    	DependancyScore: v.float64(),
-    	LicenseScore: v.float64(),
-    	NetScore: v.float64(),
-    	PulledCodeScore: v.float64(),
-    	RampUpScore: v.float64(),
-    	ResponsiveMaintainerScore: v.float64(),
+    documents: defineTable({
+      fieldOne: v.string(),
+      fieldTwo: v.object({
+        subFieldOne: v.array(v.number()),
+      }),
+    }),
+    // This definition matches the example query and mutation code:
+    numbers: defineTable({
+      value: v.number(),
     }),
   },
   
