@@ -3,11 +3,8 @@
 import { api } from "../_generated/api";
 import { query, action, ActionCtx } from "../_generated/server";
 import { v } from "convex/values";
-import { AllMetrics } from "../package_rate/Models/AllMetrics";
-import { checkForPackage } from "../queries/packageTable";
-import { uploadPackage } from "../mutations/uploadPackage";
 import { decodeBase64, unzipFile, findPackageJson, extractVersionFromPackage, debloatBase64Package, getRepoInfo, downloadPackage, downloadPackageBlob, base64ToBlob } from "../actions/packageUtils";
-import { decode } from "punycode";
+import { ratePackage } from "../handlers/packageIdHandlers";
 
 // This action will:
 // 1. Validate that either content or URL has been passed.
@@ -23,7 +20,7 @@ export const qualifyPackage = action({
             v.object({
                 Content: v.string(),
                 JSProgram: v.string(),
-                Debloat: v.boolean(),
+                debloat: v.boolean(),
                 Name: v.string(),
             }),
             v.object({
@@ -34,7 +31,7 @@ export const qualifyPackage = action({
 	},
     handler: async (ctx: ActionCtx, args) => {
         if ('Content' in args.Data) { // proceed with 2-5.
-			const { Content, JSProgram, Debloat, Name } = args.Data;
+			const { Content, JSProgram, debloat, Name } = args.Data;
 
 			if (!Content) {
 				return {
@@ -92,10 +89,10 @@ export const qualifyPackage = action({
 				};	
 			}
 
-			// Debloat if flagged.
+			// debloat if flagged.
 			let processedContent = Content;
 			let blob = base64ToBlob(Content);
-			if (Debloat === true) {
+			if (debloat === true) {
 				processedContent = await debloatBase64Package(Content);
 				blob = base64ToBlob(processedContent);
 				
@@ -109,6 +106,7 @@ export const qualifyPackage = action({
 				packageName: Name,
 				packageVersion: Version,
 				Content: storageId,
+				JSProgram,
 			}); // return the uniqueID to package with all the other details.
 
 			const packageData: any = await ctx.runQuery(api.queries.packageTable.getPackageById, { packageId: packageID });
@@ -129,20 +127,18 @@ export const qualifyPackage = action({
 
 			if (URL.includes('github.com') || URL.includes('npmjs.com')) { // Reject if it's neither from GitHub or npm.
 				// Gather metrics first. If it doesn't qualify, reject.
-				// const metrics = new AllMetrics(URL);
-				let base64Content = "";
-
-				// const packageScore = await metrics.calculateNetScore();
-
-				// if (packageScore < 0.5) {
-				// 	return {
-				// 		conflict: true, 
-				// 		metadata: {
-				// 			message: "Package failed to meet minimum requirements on one or more metric.",
-				// 			code: 424,
-				// 		}
-				// 	};
-				// } // Continue otherwise.
+				const metrics: any = await ratePackage(URL);
+				
+				console.log("Netscore:", metrics.NetScore);
+				if (metrics.NetScore < 0.5) {
+					return {
+						conflict: true, 
+						metadata: {
+							message: "Package failed to meet minimum requirements on one or more metric.",
+							code: 424,
+						}
+					};
+				}
 
 				let repoInfo = await getRepoInfo(URL); // Download from GitHub as base64 encoded content.
 				if (!repoInfo) {
@@ -156,8 +152,9 @@ export const qualifyPackage = action({
 				}
 
 				const { owner, repo } = repoInfo;
-
+				let base64Content = "";
 				try {
+					
 					base64Content = await downloadPackage(owner, repo);
 
 					// Decode package to get name, version from package.json
@@ -176,6 +173,20 @@ export const qualifyPackage = action({
 						packageName = repo;
 					}
 					console.log("Package name:", packageName);
+					const packageExists = await ctx.runQuery(api.queries.packageTable.checkForPackage, {
+						packageName: packageName,
+						packageVersion: packageVersion,
+					});
+		
+					if (packageExists) { // package exists, so propogate the error code and display the package.
+						return {
+							conflict: true,
+							metadata: {
+								message: "Package already exists.",
+								code: 409,
+							}
+						};	
+					}
 					const zipBlob = await downloadPackageBlob(owner, repo);
 					console.log("Blob ran");
 					const storageId = await ctx.storage.store(zipBlob);
@@ -186,6 +197,7 @@ export const qualifyPackage = action({
 		                packageVersion,
 		                Content: storageId,
 		                URL,
+						JSProgram,
 					});
 
 					//call the packageId Query using runQuery to get the packageID

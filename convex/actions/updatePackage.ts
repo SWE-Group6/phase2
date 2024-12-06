@@ -16,7 +16,7 @@ export const updatePackage = action({
 		ID: v.string(),
 		Content: v.optional(v.string()),
 		URL: v.optional(v.string()),
-		Debloat: v.optional(v.string()),
+		debloat: v.optional(v.string()),
 	},		
 	handler: async (ctx: ActionCtx, args) => {
 		if ('Content' in args && 'URL' in args) {
@@ -28,7 +28,7 @@ export const updatePackage = action({
 				},
 			};
 		} else if('Content' in args) {
-			const { Name, Version, ID, Content, Debloat } = args;
+			const { Name, Version, ID, Content, debloat } = args;
 			if (!Name || !Version || !ID || !Content) {
 				return {
 					conflict: true,
@@ -67,7 +67,7 @@ export const updatePackage = action({
 
 			// 2. If so, check debloat flag --> debloat package if true.
 			let processedContent = Content;
-			if (Debloat) {
+			if (debloat) {
 				processedContent = debloatBase64Package(Content);
 			}
 

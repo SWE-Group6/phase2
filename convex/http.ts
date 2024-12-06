@@ -42,7 +42,7 @@ http.route({
 });
 
 http.route({
-	path: "/upload_package",
+	path: "/package",
 	method: "POST",
 	handler: uploadPackageHandler,
 });

@@ -5,7 +5,7 @@ import { updatePackage } from "../actions/updatePackage";
 export const updatePackageHandler = httpAction(async (ctx, request) => {
 	try {
 		const body = await request.json();
-		const { Name, Version, ID, Content, URL, Debloat } = body;
+		const { Name, Version, ID, Content, URL, debloat } = body;
 
 		if ((Content && URL) || (!Content && !URL)) {
 			return new Response(
@@ -27,7 +27,7 @@ export const updatePackageHandler = httpAction(async (ctx, request) => {
 			ID, 
 			Content, 
 			URL, 
-			Debloat,
+			debloat,
         });
 
         // Check the result for conflict or success.  

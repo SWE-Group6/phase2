@@ -6,11 +6,11 @@ export const uploadPackageHandler = httpAction(async (ctx, request) => {
 	try { 
 		const body = await request.json();
 		
-		const { Content, URL, JSProgram, Debloat, Name} = body;
+		const { Content, URL, JSProgram, debloat, Name} = body;
         console.log('Content:', Content);
         console.log('URL:', URL);
         console.log('JSProgram:', JSProgram);
-        console.log('Debloat:', Debloat);
+        console.log('debloat:', debloat);
 
 		if ((Content && URL) || (!Content && !URL)) {
 			return new Response(
@@ -25,7 +25,7 @@ export const uploadPackageHandler = httpAction(async (ctx, request) => {
                 Data: {
                     Content,
                     JSProgram,
-                    Debloat,
+                    debloat,
                     Name,
                 }
             });
