@@ -34,7 +34,7 @@ const Avatar: React.FC<AvatarProps> = ({ color,
   const outlineSX = outline && {
     color: color ? `${color}.main` : `primary.main`,
     bgcolor: 'background.paper',
-    border: '2px solid',
+    border: '10px solid',
     borderColor: color ? `${color}.main` : `primary.main`
   };
   let sizeSX = {};

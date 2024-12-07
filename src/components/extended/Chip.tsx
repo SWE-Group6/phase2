@@ -21,7 +21,7 @@ const Chip = ({label, chipcolor, size, disabled, sx = {}, variant, ...others }: 
   let outlineSX = {
     color: 'primary.main',
     bgcolor: 'transparent',
-    border: '1px solid',
+    border: '5px solid',
     borderColor: 'primary.main',
     ':hover': {
       color: 'primary.light',

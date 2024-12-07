@@ -17,6 +17,12 @@ const UtilsShadow = Loadable(lazy(() => import('@/views/utilities/Shadow')));
 // sample page routing
 const SamplePage = Loadable(lazy(() => import('@/views/sample-page')));
 
+const UploadPage = Loadable(lazy(() => import('@/views/Upload')));
+const DeletePage = Loadable(lazy(() => import('@/views/Delete')));
+const RatePage = Loadable(lazy(() => import('@/views/Rate')));
+const ResetPage = Loadable(lazy(() => import('@/views/Reset')));
+
+
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -60,6 +66,42 @@ const MainRoutes = {
         {
           path: 'util-shadow',
           element: <UtilsShadow />
+        }
+      ]
+    },
+    {
+      path: 'actions',
+      children: [
+        {
+          path: 'upload',
+          element: <UploadPage />
+        }
+      ]
+    },
+    {
+      path: 'actions',
+      children: [
+        {
+          path: 'delete',
+          element: <DeletePage />
+        }
+      ]
+    },
+    {
+      path: 'actions',
+      children: [
+        {
+          path: 'rate',
+          element: <RatePage />
+        }
+      ]
+    },
+    {
+      path: 'actions',
+      children: [
+        {
+          path: 'reset',
+          element: <ResetPage />
         }
       ]
     },

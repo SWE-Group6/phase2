@@ -20,6 +20,10 @@ import Transitions from '@/components/extended/Transitions';
 // assets
 import { IconAdjustmentsHorizontal, IconSearch, IconX } from '@tabler/icons-react';
 
+// Convex functions
+import { useQuery } from 'convex/react';
+import { api } from '../../../../../convex/_generated/api';
+
 const HeaderAvatar = forwardRef<HTMLDivElement, { children: React.ReactNode }>(
     ({ children, ...others }, ref) => {
       const theme: any = useTheme();
@@ -31,11 +35,11 @@ const HeaderAvatar = forwardRef<HTMLDivElement, { children: React.ReactNode }>(
           sx={{
             ...theme.typography.commonAvatar,
             ...theme.typography.mediumAvatar,
-            bgcolor: 'secondary.light',
-            color: 'secondary.dark',
+            bgcolor: '#EEEEEE',
+            color: '#121926',
             '&:hover': {
-              bgcolor: 'secondary.dark',
-              color: 'secondary.light',
+              bgcolor: '#121926',
+              color: '#EEEEEE',
             },
           }}
           {...others} // Spread the rest of the props
@@ -109,6 +113,21 @@ MobileSearch.propTypes = {
 const SearchSection = () => {
   const [value, setValue] = useState('');
 
+  const getPackage = () => {
+    const packageData = useQuery(api.queries.packageTable.getPackageByRegex, {regex: ".*?package2.*"});
+    console.log(JSON.stringify(packageData));
+  }
+
+  const handleInput = (newValue: string) => {
+    setValue(newValue);
+  }
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      getPackage();
+    }
+  }
+
   return (
     <>
       <Box sx={{ display: { xs: 'block', md: 'none' } }}>
@@ -149,23 +168,26 @@ const SearchSection = () => {
         <OutlinedInput
           id="input-search-header"
           value={value}
-          onChange={(e) => setValue(e.target.value)}
-          placeholder="Search"
+          onChange={(e) => handleInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Search Package"
           startAdornment={
             <InputAdornment position="start">
               <IconSearch stroke={1.5} size="16px" />
             </InputAdornment>
           }
-          endAdornment={
-            <InputAdornment position="end">
-              <HeaderAvatar>
-                <IconAdjustmentsHorizontal stroke={1.5} size="20px" />
-              </HeaderAvatar>
-            </InputAdornment>
-          }
+          
           aria-describedby="search-helper-text"
           inputProps={{ 'aria-label': 'weight', sx: { bgcolor: 'transparent', pl: 0.5 } }}
-          sx={{ width: { md: 250, lg: 434 }, ml: 2, px: 2 }}
+          sx={{ 
+            width: { md: 250, lg: 434 },
+            ml: 2,
+            px: 2,
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'black', // Border color when focused (typing or clicking)
+              borderWidth: '1px'
+            } 
+          }}
         />
       </Box>
     </>

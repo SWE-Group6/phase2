@@ -64,7 +64,7 @@ const MainCard: React.FC<MainCardProps> = forwardRef<HTMLDivElement, MainCardPro
                 ? '0 2px 14px 0 rgb(32 40 45 / 8%)'
                 : 'inherit',
           },
-          backgroundColor: theme.palette.secondary.dark,
+          backgroundColor: theme.palette.secondary.PureWhite,
           ...sx,
         }}
       >

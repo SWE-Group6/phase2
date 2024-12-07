@@ -21,32 +21,32 @@ const pages = {
 
             children: [
                 {
-                    id: 'login3',
+                    id: 'upload',
                     title: 'Upload',
                     type: 'item',
-                    url: '/dashboard',
-                    target: true
+                    url: '/actions/upload',
+                    breadcrumbs: false
                 },
                 {
-                    id: 'register3',
+                    id: 'delete',
                     title: 'Delete',
                     type: 'item',
-                    url: '/dashboard',
-                    target: true
+                    url: '/actions/delete',
+                    breadcrumbs: false
                 },
                 {
-                    id: 'login3',
+                    id: 'rate',
                     title: 'Rate',
                     type: 'item',
-                    url: '/dashboard',
-                    target: true
+                    url: '/actions/rate',
+                    breadcrumbs: false
                 },
                 {
-                    id: 'register3',
+                    id: 'reset',
                     title: 'Reset',
                     type: 'item',
-                    url: '/dashboard',
-                    target: true
+                    url: '/actions/reset',
+                    breadcrumbs: false
                 }
             ]
         }

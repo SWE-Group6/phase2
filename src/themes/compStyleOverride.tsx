@@ -1,5 +1,9 @@
 export default function componentStyleOverrides(theme: any) {
     const bgColor = theme.colors?.grey50;
+    const blackcolor = theme.colors?.grey900;
+    const selectedcolor = theme.colors?.grey100;
+    const hovercolor = theme.colors?.grey300;
+
     return {
       MuiButton: {
         styleOverrides: {
@@ -54,20 +58,20 @@ export default function componentStyleOverrides(theme: any) {
             paddingTop: '10px',
             paddingBottom: '10px',
             '&.Mui-selected': {
-              color: theme.menuSelected,
-              backgroundColor: theme.menuSelectedBack,
+              color: blackcolor,
+              backgroundColor: selectedcolor,
               '&:hover': {
-                backgroundColor: theme.menuSelectedBack
+                backgroundColor: hovercolor
               },
               '& .MuiListItemIcon-root': {
-                color: theme.menuSelected
+                color: blackcolor
               }
             },
             '&:hover': {
-              backgroundColor: theme.menuSelectedBack,
-              color: theme.menuSelected,
+              backgroundColor: hovercolor,
+              color: blackcolor,
               '& .MuiListItemIcon-root': {
-                color: theme.menuSelected
+                color: blackcolor
               }
             }
           }

@@ -32,7 +32,7 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 import MainCard from '@/components/cards/MainCard';
 import Transitions from '@/components/extended/Transitions';
 //import UpgradePlanCard from './UpgradePlanCard';
-import User1 from '@/user-round.svg';
+import User1 from '@/assets/images/icons/user-icon.png';
 
 // assets
 import { IconLogout, IconSearch, IconSettings, IconUser } from '@tabler/icons-react';
@@ -95,12 +95,15 @@ const ProfileSection = () => {
           transition: 'all .2s ease-in-out',
           borderColor: theme.palette.primary.light,
           backgroundColor: theme.palette.primary.light,
+          '& svg': {
+            stroke: theme.palette.grey[900]
+          },
           '&[aria-controls="menu-list-grow"], &:hover': {
-            borderColor: theme.palette.primary.main,
-            background: `${theme.palette.primary.main}!important`,
+            borderColor: 'transparent',
+            background: `${theme.palette.grey[300]}!important`,
             color: theme.palette.primary.light,
             '& svg': {
-              stroke: theme.palette.primary.light
+              stroke: theme.palette.grey[900],
             }
           },
           '& .MuiChip-label': {
@@ -113,7 +116,13 @@ const ProfileSection = () => {
             sx={{
               ...theme.typography.mediumAvatar,
               margin: '8px 0 8px 8px !important',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              backgroundColor: 'white',
+              '& img': {
+                objectFit: 'cover', // Ensures the image fits within the Avatar
+                width: '110%', // Make the image smaller relative to the Avatar size
+                height: '110%', // Adjust height proportionally
+              }
             }}
             ref={anchorRef}
             aria-controls={open ? 'menu-list-grow' : undefined}
@@ -162,22 +171,6 @@ const ProfileSection = () => {
                       </Stack>
                       <Typography variant="subtitle2">Project Admin</Typography>
                     </Stack>
-                    <OutlinedInput
-                      sx={{ width: '100%', pr: 1, pl: 2, my: 2 }}
-                      id="input-search-profile"
-                      value={value}
-                      onChange={(e) => setValue(e.target.value)}
-                      placeholder="Search profile options"
-                      startAdornment={
-                        <InputAdornment position="start">
-                          <IconSearch stroke={1.5} size="1rem" color={theme.palette.grey[500]} />
-                        </InputAdornment>
-                      }
-                      aria-describedby="search-helper-text"
-                      inputProps={{
-                        'aria-label': 'weight'
-                      }}
-                    />
                     <Divider />
                   </Box>
                   <PerfectScrollbar style={{ height: '100%', maxHeight: 'calc(100vh - 250px)', overflowX: 'hidden' }}>
@@ -199,44 +192,6 @@ const ProfileSection = () => {
                           }
                         }}
                       >
-                        <ListItemButton
-                          sx={{ borderRadius: `${customization.borderRadius}px` }}
-                          selected={selectedIndex === 0}
-                          onClick={(event) => handleListItemClick(event, 0, '#')}
-                        >
-                          <ListItemIcon>
-                            <IconSettings stroke={1.5} size="1.3rem" />
-                          </ListItemIcon>
-                          <ListItemText primary={<Typography variant="body2">Account Settings</Typography>} />
-                        </ListItemButton>
-                        <ListItemButton
-                          sx={{ borderRadius: `${customization.borderRadius}px` }}
-                          selected={selectedIndex === 1}
-                          onClick={(event) => handleListItemClick(event, 1, '#')}
-                        >
-                          <ListItemIcon>
-                            <IconUser stroke={1.5} size="1.3rem" />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <Grid container spacing={1} justifyContent="space-between">
-                                <Grid item>
-                                  <Typography variant="body2">Social Profile</Typography>
-                                </Grid>
-                                <Grid item>
-                                  <Chip
-                                    label="02"
-                                    size="small"
-                                    sx={{
-                                      bgcolor: theme.palette.warning.dark,
-                                      color: theme.palette.background.default
-                                    }}
-                                  />
-                                </Grid>
-                              </Grid>
-                            }
-                          />
-                        </ListItemButton>
                         <ListItemButton
                           sx={{ borderRadius: `${customization.borderRadius}px` }}
                           selected={selectedIndex === 4}
