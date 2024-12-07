@@ -19,12 +19,24 @@ export default defineSchema(
           JSProgram: v.string(), // Optional JavaScript program (for sensitive modules)
         }),
         v.object({
+          Content: v.string(), // Base64 encoded zip file content
           URL: v.string(), // URL for public ingestion
           JSProgram: v.string(), // Optional JavaScript program (for sensitive modules)
         })
       ),
-    })
+    }),
+    documents: defineTable({
+      fieldOne: v.string(),
+      fieldTwo: v.object({
+        subFieldOne: v.array(v.number()),
+      }),
+    }),
+    // This definition matches the example query and mutation code:
+    numbers: defineTable({
+      value: v.number(),
+    }),
   },
+  
   // If you ever get an error about schema mismatch
   // between your data and your schema, and you cannot
   // change the schema to match the current data in your database,

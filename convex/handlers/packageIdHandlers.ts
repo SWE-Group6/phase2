@@ -22,6 +22,10 @@ const generateResponse = async (action: string, pkg: any) => {
 
 
 export const getPackageByIdHTTPHandler = httpAction(async (ctx, request) => {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) {
+      return new Response("Unauthorized", { status: 401 });
+  }
   const url = new URL(request.url);
   const pathParts = url.pathname.split("/"); // Split the path into parts
   const packageId = pathParts[2]; // Assuming "/package/{id}/rate"

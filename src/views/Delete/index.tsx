@@ -4,11 +4,11 @@ import Typography from '@mui/material/Typography';
 import FormControl from '@mui/material/FormControl';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
-import { useMutation } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
+import { useAction } from 'convex/react';
 
 export default function ComposedTextField() {
-  const mutation = useMutation(api.mutations.deletePackage.deletePackage);
+  const deleteAction = useAction(api.actions.deletePackage.deletePackage);
   const inputRef = React.useRef<HTMLInputElement>(null); // Add a ref for the input field
 
   const handleEnterPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -20,9 +20,9 @@ export default function ComposedTextField() {
 
       if (name && version && URL) {
         console.log("Calling mutation...");
-        mutation({ name, version})
+        deleteAction({ name, version})
           .then((result) => {
-            console.log("Mutation result:", result);
+            console.log("Delete result:", result);
             if (inputRef.current) {
               inputRef.current.value = ''; // Clear the input field
             }

@@ -5,38 +5,31 @@ import FormControl from '@mui/material/FormControl';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
 import { Card, CardContent } from '@mui/material';
-import { ratePackage } from '../../../convex/handlers/packageIdHandlers';
+import { useAction } from 'convex/react';
+import { api } from '../../../convex/_generated/api';
 
 export default function ComposedTextField() {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [metrics, setMetrics] = React.useState<any | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+  const rateAction = useAction(api.actions.ratePackage.ratePackage);
 
   const handleEnterPress = async (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       event.preventDefault();
-
       const inputValue = (event.target as HTMLInputElement).value.trim();
-      console.log("Input Value:", inputValue);
 
-      const [packageName, URL] = inputValue.split(',').map(val => val.trim());
+      const [name, version] = inputValue.split(',').map(val => val.trim());
 
-      if (packageName && URL) {
-        try {
-          console.log("Calling ratePackage with URL:", URL);
-          const fetchedMetrics = await ratePackage(URL);
-          console.log("Fetched Metrics:", fetchedMetrics); // Log the entire response
-
-          if (fetchedMetrics) {
-            setMetrics(fetchedMetrics);
-            setError(null);
-          } else {
-            setError("No metrics returned. Please check the URL or try again.");
-          }
-        } catch (err) {
-          console.error("Error fetching metrics:", err);
-          setError("Failed to fetch metrics. Please try again later.");
-        }
+      if (name && version) {
+        rateAction({name , version})
+          .then((result) => {
+            console.log("rating result:", result);
+            if (inputRef.current) {
+              inputRef.current.value = ''; // Clear the input field
+            }
+          })
+          .catch((error) => console.error("Mutation failed:", error));
       } else {
         setError("Invalid input. Please provide both values in the format: 'name, url'.");
       }

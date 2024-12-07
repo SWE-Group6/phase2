@@ -37,6 +37,8 @@ import User1 from '@/assets/images/icons/user-icon.png';
 // assets
 import { IconLogout, IconSearch, IconSettings, IconUser } from '@tabler/icons-react';
 
+import { useAuth } from '@clerk/clerk-react';
+
 // ==============================|| PROFILE MENU ||============================== //
 
 const ProfileSection = () => {
@@ -49,12 +51,19 @@ const ProfileSection = () => {
   const [notification, setNotification] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [open, setOpen] = useState(false);
+  const { signOut } = useAuth();
+
   /**
    * anchorRef is used on different componets and specifying one type leads to other components throwing an error
    * */
   const anchorRef: any = useRef(null);
   const handleLogout = async () => {
-    console.log('Logout');
+    try {
+      await signOut();
+      navigate('/');
+    } catch (error) {
+      console.error('Logout Failed', error);
+    }
   };
 
   const handleClose = (event: any) => {

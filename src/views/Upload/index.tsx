@@ -4,11 +4,11 @@ import Typography from '@mui/material/Typography';
 import FormControl from '@mui/material/FormControl';
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
-import { useMutation } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
+import { useAction } from 'convex/react';
 
 export default function ComposedTextField() {
-  const mutation = useMutation(api.mutations.uploadPackage.uploadPackage);
+  const uploadAction = useAction(api.actions.qualifyPackage.qualifyPackage);
   const inputRef = React.useRef<HTMLInputElement>(null); // Add a ref for the input field
 
   const handleEnterPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -16,18 +16,19 @@ export default function ComposedTextField() {
       event.preventDefault(); // Prevent form submission
       const inputValue = (event.target as HTMLInputElement).value.trim();
 
-      const [packageName, packageVersion, URL] = inputValue.split(',').map(val => val.trim());
+      const [jsprogram, url] = inputValue.split(',').map(val => val.trim());
 
-      if (packageName && packageVersion && URL) {
-        console.log("Calling mutation...");
-        mutation({ packageName, packageVersion, URL })
-          .then((result) => {
-            console.log("Mutation result:", result);
-            if (inputRef.current) {
-              inputRef.current.value = ''; // Clear the input field
-            }
-          })
-          .catch((error) => console.error("Mutation failed:", error));
+      if (url && jsprogram) {
+        uploadAction(
+          {
+            Data: {
+              JSProgram: jsprogram,
+              URL: url
+            },
+          }
+        );
+        console.log("Uploading Package...");
+
       } else {
         console.error("Invalid input. Please provide all three values (e.g., 'name, version, url').");
       }
@@ -68,7 +69,7 @@ export default function ComposedTextField() {
           id="single-input"
           onFocus={() => console.log("Input focused")}
           onKeyDown={handleEnterPress}
-          placeholder="e.g., jest, 1.0.2, https://jest.com"
+          placeholder="e.g., console.log(''), https://example.com"
           inputRef={inputRef} 
         />
       </FormControl>

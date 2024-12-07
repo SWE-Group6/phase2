@@ -25,7 +25,6 @@ import { api } from '../../../convex/_generated/api';
 
 const Dashboard = () => {
   const [isLoading, setLoading] = useState(true);
-  //const packageData = useQuery(api.queries.packageTable.getPackageById, {packageId: "jh7factmv6mjvd0knqqcd4p05175yq79"});
   const queryData = useQuery(api.queries.packageTable.getPackagesMetadata, {paginationOpts: {numItems: 20, cursor: null }, });
   const packageData = queryData?.packagesData || [];
   const packageNames = packageData?.map((pkg: any) => pkg.Name);
