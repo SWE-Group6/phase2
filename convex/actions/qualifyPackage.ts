@@ -180,13 +180,20 @@ export const qualifyPackage = action({
 						}
 						packageName = repo;
 					}
+					const NameString = packageName;
+					const VersionString = packageVersion;
+					console.log('Name:', NameString);
+					console.log('Version:', VersionString);
+					//check if the Name and Version filter strings are empty and create the filters object accordingly
+					let filters: any = {};
+					filters.Name = NameString;
+					filters.Version = VersionString;
+					const limit = 100;
+					const offset = null;
 					console.log("Package name:", packageName);
-					const packageExists = await ctx.runQuery(api.queries.packageTable.checkForPackage, {
-						packageName: packageName,
-						packageVersion: packageVersion,
-					});
+					const packageExists = await ctx.runQuery(api.queries.packageTable.getPackagesMetadata, {paginationOpts: {numItems: limit, cursor: offset }, filters});
 		
-					if (packageExists) { // package exists, so propogate the error code and display the package.
+					if (packageExists.packagesData.length != 0) { // package exists, so propogate the error code and display the package.
 						return {
 							conflict: true,
 							metadata: {
