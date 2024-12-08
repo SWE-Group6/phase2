@@ -33,7 +33,7 @@ export default function ComposedTextField() {
             Content: zipBase64,
             JSProgram: jsProgram.trim() || '',
             Version: version.trim(),
-            debloat: debloat_,
+            debloat: false,
             Name: name.trim(),
             ID: id.trim(),
           },
@@ -50,7 +50,7 @@ export default function ComposedTextField() {
       }
     } else if (formType === 'URL') {
       // Validate URL form
-      if (url.trim() && zipBase64 && jsProgram.trim() && version.trim() && name.trim() && id.trim()) {
+      if (url.trim() ) {
         updateAction({
           Data: {
             URL: url.trim(),
@@ -59,6 +59,7 @@ export default function ComposedTextField() {
             Version: version.trim(),
             Name: name.trim(),
             ID: id.trim(),
+            Secret: false,
           },
         });
         console.log('Uploading Package (URL form)...');
