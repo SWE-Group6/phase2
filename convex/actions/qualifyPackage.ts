@@ -26,6 +26,7 @@ export const qualifyPackage = action({
                 debloat: v.boolean(),
                 Name: v.string(),
 				Secret: v.boolean(),
+				Version: v.string(),
             }),
             v.object({
                 URL: v.string(),
@@ -96,14 +97,7 @@ export const qualifyPackage = action({
 			const packageJSON = findPackageJson(zip);
 
 			// 3. Extract version info from the version field.
-			let Version = "1.0.0"; // Default to 1.0.0 if version does not exist.
-
-			if (packageJSON) {
-				const extractedVersion = extractVersionFromPackage(packageJSON);
-				if (extractedVersion) {
-					Version = extractedVersion;
-				}
-			}
+			const Version = args.Data.Version;
 			const NameString = Name;
 			const VersionString = Version;
 			console.log('Name:', NameString);
@@ -148,6 +142,7 @@ export const qualifyPackage = action({
 				packageVersion: Version,
 				Content: storageId,
 				JSProgram,
+				Secret
 			}); // return the uniqueID to package with all the other details.
 
 			const packageData: any = await ctx.runQuery(api.queries.packageTable.getPackageById, { packageId: packageID });
