@@ -60,7 +60,6 @@ declare const fullApi: ApiFromModules<{
   "handlers/updatePackageHandler": typeof handlers_updatePackageHandler;
   "handlers/uploadPackageHandler": typeof handlers_uploadPackageHandler;
   http: typeof http;
-
   "mutations/uploadPackage": typeof mutations_uploadPackage;
   myFunctions: typeof myFunctions;
   "package_rate/Models/AllMetrics": typeof package_rate_Models_AllMetrics;

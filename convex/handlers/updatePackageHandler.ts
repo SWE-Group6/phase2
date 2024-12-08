@@ -5,14 +5,14 @@ import { updatePackage } from "../actions/updatePackage";
 export const updatePackageHandler = httpAction(async (ctx, request) => {
 	try {
 		const body = await request.json();
-		const { Name, Version, ID, Content, URL, debloat } = body;
+		const Name = body.metadata.Name;
+        const Version = body.metadata.Version;
+        const ID = body.metadata.ID;
+        const Content = body.data.Content;
+        const URL = body.data.URL;
+        const debloat = body.data.debloat;
+        const JSProgram = body.data.JSProgram;
 
-		if ((Content && URL) || (!Content && !URL)) {
-			return new Response(
-                JSON.stringify({ error: "Provide either content or URL, but not both" }),              
-                { status: 400 } // Bad request                                                         
-            );
-		}
 
         if (!Name || !Version || !ID) {
             return new Response(
@@ -20,16 +20,31 @@ export const updatePackageHandler = httpAction(async (ctx, request) => {
                 { status: 400 },
             );
         }
-
-        const result = await ctx.runAction(api.actions.updatePackage.updatePackage, {                        
-		    Name, 
-			Version, 
-			ID, 
-			Content, 
-			URL, 
-			debloat,
-        });
-
+        let result;
+        if((Content && URL)) {
+            result = await ctx.runAction(api.actions.updatePackage.updatePackage, {                        
+                Data: {
+                    Content,
+                    URL,
+                    JSProgram,
+                    Name,
+                    ID,
+                    Version,
+                }
+            });
+        }
+        else {
+            result = await ctx.runAction(api.actions.updatePackage.updatePackage, {
+                Data: {
+                    Content,
+                    JSProgram,
+                    debloat,
+                    Name,
+                    ID,
+                    Version,
+                }
+            });
+        }
         // Check the result for conflict or success.  
         if (result.conflict) {
             return new Response(
@@ -43,10 +58,7 @@ export const updatePackageHandler = httpAction(async (ctx, request) => {
 
          // If there's no conflict, return the success response. 
          return new Response(
-             JSON.stringify({
-                 message: "Package updated successfully.",
-                 metadata: result.metadata,
-             }),
+             JSON.stringify(result),
              { status: result.metadata.code || 200 } // Created or appropriate success code.
          );
 	} catch (error) {
