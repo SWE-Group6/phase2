@@ -3,7 +3,6 @@
 import { api } from "../_generated/api";
 import { query, action, ActionCtx } from "../_generated/server";
 import { v } from "convex/values";
-import { checkForPackage, getPackageAndVersion } from "../queries/packageTable";
 import { uploadPackage } from "../mutations/uploadPackage";
 import { debloatBase64Package, getRepoInfo, downloadPackage } from "../actions/packageUtils";
 
