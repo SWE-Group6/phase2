@@ -45,7 +45,8 @@ export const uploadPackageHandler = httpAction(async (ctx, request) => {
                     JSProgram,
                     debloat,
                     Name,
-                    Secret
+                    Secret,
+                    Version: "1.0.0"
                 }
             });
         } else if (URL) {

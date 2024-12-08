@@ -139,6 +139,7 @@ export const updatePackage = action({
                     debloat,
                     Name,
 					Secret: args.Data.Secret || false,
+					Version: args.Data.Version
                 }
             });
         }
