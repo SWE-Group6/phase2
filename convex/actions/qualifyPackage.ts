@@ -5,7 +5,10 @@ import { query, action, ActionCtx } from "../_generated/server";
 import { v } from "convex/values";
 import { decodeBase64, unzipFile, findPackageJson, extractVersionFromPackage, debloatBase64Package, getRepoInfo, downloadPackage, downloadPackageBlob, base64ToBlob } from "../actions/packageUtils";
 import { ratePackage } from "../handlers/packageIdHandlers";
+import { createClerkClient } from "@clerk/backend";
 
+
+const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })
 // This action will:
 // 1. Validate that either content or URL has been passed.
 // 2. Fetch package details from URL or raw content.
@@ -22,17 +25,46 @@ export const qualifyPackage = action({
                 JSProgram: v.string(),
                 debloat: v.boolean(),
                 Name: v.string(),
+				Secret: v.boolean(),
             }),
             v.object({
                 URL: v.string(),
                 JSProgram: v.string(),
+				Secret: v.boolean(),
             }),
         )
 	},
     handler: async (ctx: ActionCtx, args) => {
+			const Secret = args.Data.Secret || false;
+			const identity = await ctx.auth.getUserIdentity();
+
+			const organizationId = "org_2plow6YcQeyrrUQEzl72EzJQmDA"
+			const orgList = await clerkClient.organizations.getOrganizationMembershipList({ organizationId }) 
+			console.log('OrgList:', orgList);
+			const userEmail = identity?.email;
+
+			// Check if the user's email is in the orgList
+			const isUserInOrg = orgList.data.some((membership) => membership.publicUserData?.identifier === userEmail);
+
+			if (isUserInOrg) {
+			console.log(`User with email ${userEmail} is in the organization.`);
+			} else {
+			console.log(`User with email ${userEmail} is NOT in the organization.`);
+			}
+			if (Secret==true && !isUserInOrg) {
+				//check if the secret is set by the member of the org: org_2plow6YcQeyrrUQEzl72EzJQmDA using clerk
+				return {
+					conflict: true,
+					metadata: {
+						message: "User not allowed to set Secret.",
+						code: 403,
+					}
+				};
+				
+			}
         if ('Content' in args.Data) { // proceed with 2-5.
 			const { Content, JSProgram, debloat, Name } = args.Data;
-
+			const Secret = args.Data.Secret;
 			if (!Content) {
 				return {
 					conflict: true,
@@ -53,6 +85,7 @@ export const qualifyPackage = action({
 				};
 			}
 
+			
 			// 1. Decode files.
 			const decodedFiles = decodeBase64(Content);
 
@@ -213,6 +246,7 @@ export const qualifyPackage = action({
 		                Content: storageId,
 		                URL,
 						JSProgram,
+						Secret: args.Data.Secret || false
 					});
 
 					//call the packageId Query using runQuery to get the packageID
