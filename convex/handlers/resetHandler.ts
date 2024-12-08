@@ -4,7 +4,7 @@ import { Package } from "../package_rate/Models/Package"
 
 export const resetHandler = httpAction(async (ctx, request) => {
     try {
-        await ctx.runMutation(api.mutation.packageTable.clearTable);
+        await ctx.runMutation(api.mutations.packageTable.clearTable);
 
         return new Response(JSON.stringify({}));
 

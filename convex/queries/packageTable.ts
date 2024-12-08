@@ -87,6 +87,7 @@ export const getPackageByRegex = query({
         throw new Error("Unauthorized");
     }
     const result = await ctx.db.query("packageTable").collect(); // Fetch all packages
+    console.log('All Packages:', result);
     //filter the packages based on the regex
     const regex = new RegExp(args.regex, 'i');
     const filteredPackages = result.filter((pkg: any) => regex.test(pkg.metadata.Name));
