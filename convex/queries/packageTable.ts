@@ -6,6 +6,10 @@ import semver from 'semver';
 export const getPackageById = query({
   args: { packageId: v.id("packageTable") }, // Validate that packageId is an ID from "packageTable"
   handler: async (ctx: any, args: any) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+        throw new Error("Unauthorized");
+    }
     const pkg = await ctx.db.get(args.packageId); // Fetch the package by ID
     pkg.metadata.ID = pkg._id;
     if (!pkg) {
@@ -30,6 +34,10 @@ export const getPackagesMetadata = query({
     },
     handler: async (ctx: any, args: any) => {
         console.log('args:', args);
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) {
+            throw new Error("Unauthorized");
+        }
         let dbQuery = ctx.db.query("packageTable");
 
         // Apply name filter at the database level if provided
@@ -74,6 +82,10 @@ export const getPackagesMetadata = query({
 export const getPackageByRegex = query({
   args: { regex: v.string() },
   handler: async (ctx: any, args: any) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+        throw new Error("Unauthorized");
+    }
     const result = await ctx.db.query("packageTable").collect(); // Fetch all packages
     //filter the packages based on the regex
     const regex = new RegExp(args.regex, 'i');
@@ -86,4 +98,3 @@ export const getPackageByRegex = query({
     return filteredPackages;
   },
 });
-  
