@@ -34,7 +34,7 @@ export default function ComposedTextField() {
           Data: {
             URL: url.trim(),
             JSProgram: jsProgram.trim() || '',
-            Secret: secret,
+            Secret: false,
           },
         });
         console.log('Uploading Package (URL form)...');
@@ -45,14 +45,14 @@ export default function ComposedTextField() {
       }
     } else if (formType === 'Content') {
       // Validate Content form
-      if (name.trim() && zipBase64.trim() && jsProgram.trim() && version.trim()) {
+      if (name.trim() && zipBase64.trim() ) {
         uploadAction({
           Data: {
             Content: zipBase64,
             JSProgram: jsProgram.trim() || '',
             Name: name.trim(),
             debloat: debloat_,
-            Secret: secret,
+            Secret: false,
             Version: version.trim(),
           },
         });
@@ -61,6 +61,9 @@ export default function ComposedTextField() {
         setJsProgram('');
         setDebloat(false);
         setName('');
+        setSecret(false);
+        setVersion('');
+
       } else {
         console.error('Invalid input. Content, Name, and Zip file are required.');
       }
@@ -223,6 +226,15 @@ export default function ComposedTextField() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g., Package Name"
+            />
+          </FormControl>
+          <FormControl variant="standard">
+            <InputLabel htmlFor="version-input">Version</InputLabel>
+            <Input
+              id="version-input"
+              value={version}
+              onChange={(e) => setVersion(e.target.value)}
+              placeholder="e.g., 1.0.0"
             />
           </FormControl>
         </>

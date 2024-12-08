@@ -30,7 +30,7 @@ export default function App() {
       </main>
       </Unauthenticated>
       <Authenticated>
-      <StyledEngineProvider injectFirst>
+      <StyledEngineProvider injectFirst> 
         <ThemeProvider theme={themes(customization)}>
           <CssBaseline />
           <NavigationScroll>
