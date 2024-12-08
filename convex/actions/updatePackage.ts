@@ -17,6 +17,7 @@ type UpdatePackageData = {
     Name: string;
     ID: string;
     URL?: string;
+	Secret: boolean;
 }
 
 type UpdatePackageResult = {
@@ -36,6 +37,7 @@ export const updatePackage = action({
                 debloat: v.boolean(),
                 Name: v.string(), // Ensure Name is included here
                 ID: v.string(),   // Add ID if needed
+				Secret: v.optional(v.boolean()),
             }),
             v.object({
                 URL: v.string(),
@@ -44,6 +46,7 @@ export const updatePackage = action({
 				Version: v.string(),
                 Name: v.string(), // Include Name here as well
                 ID: v.string(),   // Add ID if needed
+				Secret: v.optional(v.boolean()),
             }),
         )
 	},		
@@ -122,6 +125,7 @@ export const updatePackage = action({
                 Data: {
                     URL,
                     JSProgram,
+					Secret: args.Data.Secret || false,
                 }
             });
 
@@ -134,6 +138,7 @@ export const updatePackage = action({
                     JSProgram,
                     debloat,
                     Name,
+					Secret: args.Data.Secret || false,
                 }
             });
         }

@@ -22,10 +22,12 @@ export const qualifyPackage = action({
                 JSProgram: v.string(),
                 debloat: v.boolean(),
                 Name: v.string(),
+				Secret: v.boolean(),
             }),
             v.object({
                 URL: v.string(),
                 JSProgram: v.string(),
+				Secret: v.boolean(),
             }),
         )
 	},
@@ -213,6 +215,7 @@ export const qualifyPackage = action({
 		                Content: storageId,
 		                URL,
 						JSProgram,
+						Secret: args.Data.Secret || false
 					});
 
 					//call the packageId Query using runQuery to get the packageID
