@@ -12,6 +12,7 @@ export default defineSchema(
       metadata: v.object({
         Name: v.string(), // Package name
         Version: v.string(), // Package version
+        Secret: v.optional(v.boolean()), // Whether the package is private
       }),
       data: v.union(
         v.object({

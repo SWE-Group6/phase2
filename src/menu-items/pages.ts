@@ -28,10 +28,10 @@ const pages = {
                     breadcrumbs: false
                 },
                 {
-                    id: 'delete',
-                    title: 'Delete',
+                    id: 'update',
+                    title: 'Update',
                     type: 'item',
-                    url: '/actions/delete',
+                    url: '/actions/update',
                     breadcrumbs: false
                 },
                 {

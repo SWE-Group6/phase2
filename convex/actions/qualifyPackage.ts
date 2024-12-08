@@ -5,7 +5,10 @@ import { query, action, ActionCtx } from "../_generated/server";
 import { v } from "convex/values";
 import { decodeBase64, unzipFile, findPackageJson, extractVersionFromPackage, debloatBase64Package, getRepoInfo, downloadPackage, downloadPackageBlob, base64ToBlob } from "../actions/packageUtils";
 import { ratePackage } from "../handlers/packageIdHandlers";
+import { createClerkClient } from "@clerk/backend";
 
+
+const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })
 // This action will:
 // 1. Validate that either content or URL has been passed.
 // 2. Fetch package details from URL or raw content.
@@ -22,17 +25,47 @@ export const qualifyPackage = action({
 				JSProgram: v.string(),
 				debloat: v.boolean(),
 				Name: v.string(),
+				Secret: v.boolean(),
+				Version: v.string(),
 			}),
 			v.object({
 				URL: v.string(),
 				JSProgram: v.string(),
+				Secret: v.boolean(),
 			}),
 		)
 	},
 	handler: async (ctx: ActionCtx, args) => {
+		const Secret = args.Data.Secret || false;
+		const identity = await ctx.auth.getUserIdentity();
+
+		const organizationId = "org_2plow6YcQeyrrUQEzl72EzJQmDA"
+		const orgList = await clerkClient.organizations.getOrganizationMembershipList({ organizationId })
+		console.log('OrgList:', orgList);
+		const userEmail = identity?.email;
+
+		// Check if the user's email is in the orgList
+		const isUserInOrg = orgList.data.some((membership) => membership.publicUserData?.identifier === userEmail);
+
+		if (isUserInOrg) {
+			console.log(`User with email ${userEmail} is in the organization.`);
+		} else {
+			console.log(`User with email ${userEmail} is NOT in the organization.`);
+		}
+		if (Secret == true && !isUserInOrg) {
+			//check if the secret is set by the member of the org: org_2plow6YcQeyrrUQEzl72EzJQmDA using clerk
+			return {
+				conflict: true,
+				metadata: {
+					message: "User not allowed to set Secret.",
+					code: 403,
+				}
+			};
+
+		}
 		if ('Content' in args.Data) { // proceed with 2-5.
 			const { Content, JSProgram, debloat, Name } = args.Data;
-
+			const Secret = args.Data.Secret;
 			if (!Content) {
 				return {
 					conflict: true,
@@ -53,6 +86,7 @@ export const qualifyPackage = action({
 				};
 			}
 
+
 			// 1. Decode files.
 			const decodedFiles = decodeBase64(Content);
 
@@ -63,21 +97,22 @@ export const qualifyPackage = action({
 			const packageJSON = findPackageJson(zip);
 
 			// 3. Extract version info from the version field.
-			let Version = "1.0.0"; // Default to 1.0.0 if version does not exist.
+			const Version = args.Data.Version;
+			const NameString = Name;
+			const VersionString = Version;
+			console.log('Name:', NameString);
+			console.log('Version:', VersionString);
+			//check if the Name and Version filter strings are empty and create the filters object accordingly
+			let filters: any = {};
+			filters.Name = NameString;
+			filters.Version = VersionString;
+			const limit = 100;
+			const offset = null;
+			const packageExists = await ctx.runQuery(api.queries.packageTable.getPackagesMetadata, { paginationOpts: { numItems: limit, cursor: offset }, filters });
+			console.log("Package exists:", packageExists);
+			//how to check if an array is empty
 
-			if (packageJSON) {
-				const extractedVersion = extractVersionFromPackage(packageJSON);
-				if (extractedVersion) {
-					Version = extractedVersion;
-				}
-			}
-
-			const packageExists = await ctx.runQuery(api.queries.packageTable.checkForPackage, {
-				packageName: Name,
-				packageVersion: Version,
-			});
-
-			if (packageExists) { // package exists, so propogate the error code and display the package.
+			if (packageExists.packagesData.length != 0) { // package exists, so propogate the error code and display the package.
 				return {
 					conflict: true,
 					metadata: {
@@ -107,6 +142,7 @@ export const qualifyPackage = action({
 				packageVersion: Version,
 				Content: storageId,
 				JSProgram,
+				Secret
 			}); // return the uniqueID to package with all the other details.
 
 			const packageData: any = await ctx.runQuery(api.queries.packageTable.getPackageById, { packageId: packageID });
@@ -172,13 +208,20 @@ export const qualifyPackage = action({
 						}
 						packageName = repo;
 					}
+					const NameString = packageName;
+					const VersionString = packageVersion;
+					console.log('Name:', NameString);
+					console.log('Version:', VersionString);
+					//check if the Name and Version filter strings are empty and create the filters object accordingly
+					let filters: any = {};
+					filters.Name = NameString;
+					filters.Version = VersionString;
+					const limit = 100;
+					const offset = null;
 					console.log("Package name:", packageName);
-					const packageExists = await ctx.runQuery(api.queries.packageTable.checkForPackage, {
-						packageName: packageName,
-						packageVersion: packageVersion,
-					});
+					const packageExists = await ctx.runQuery(api.queries.packageTable.getPackagesMetadata, { paginationOpts: { numItems: limit, cursor: offset }, filters });
 
-					if (packageExists) { // package exists, so propogate the error code and display the package.
+					if (packageExists.packagesData.length != 0) { // package exists, so propogate the error code and display the package.
 						return {
 							conflict: true,
 							metadata: {
@@ -198,6 +241,7 @@ export const qualifyPackage = action({
 						Content: storageId,
 						URL,
 						JSProgram,
+						Secret: args.Data.Secret || false
 					});
 
 					//call the packageId Query using runQuery to get the packageID

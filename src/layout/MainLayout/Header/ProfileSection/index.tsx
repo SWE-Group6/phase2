@@ -24,6 +24,7 @@ import Popper from '@mui/material/Popper';
 import Stack from '@mui/material/Stack';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
+import { UserButton } from '@clerk/clerk-react';
 
 // third-party
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -94,134 +95,9 @@ const ProfileSection = () => {
     prevOpen.current = open;
   }, [open]);
 
-  return (
-    <>
-      <Chip
-        sx={{
-          height: '48px',
-          alignItems: 'center',
-          borderRadius: '27px',
-          transition: 'all .2s ease-in-out',
-          borderColor: theme.palette.primary.light,
-          backgroundColor: theme.palette.primary.light,
-          '& svg': {
-            stroke: theme.palette.grey[900]
-          },
-          '&[aria-controls="menu-list-grow"], &:hover': {
-            borderColor: 'transparent',
-            background: `${theme.palette.grey[300]}!important`,
-            color: theme.palette.primary.light,
-            '& svg': {
-              stroke: theme.palette.grey[900],
-            }
-          },
-          '& .MuiChip-label': {
-            lineHeight: 0
-          }
-        }}
-        icon={
-          <Avatar
-            src={User1}
-            sx={{
-              ...theme.typography.mediumAvatar,
-              margin: '8px 0 8px 8px !important',
-              cursor: 'pointer',
-              backgroundColor: 'white',
-              '& img': {
-                objectFit: 'cover', // Ensures the image fits within the Avatar
-                width: '110%', // Make the image smaller relative to the Avatar size
-                height: '110%', // Adjust height proportionally
-              }
-            }}
-            ref={anchorRef}
-            aria-controls={open ? 'menu-list-grow' : undefined}
-            aria-haspopup="true"
-            color="inherit"
-          />
-        }
-        label={<IconSettings stroke={1.5} size="1.5rem" color={theme.palette.primary.main} />}
-        variant="outlined"
-        ref={anchorRef}
-        aria-controls={open ? 'menu-list-grow' : undefined}
-        aria-haspopup="true"
-        onClick={handleToggle}
-        color="primary"
-      />
-      <Popper
-        placement="bottom-end"
-        open={open}
-        anchorEl={anchorRef.current}
-        role={undefined}
-        transition
-        disablePortal
-        popperOptions={{
-          modifiers: [
-            {
-              name: 'offset',
-              options: {
-                offset: [0, 14]
-              }
-            }
-          ]
-        }}
-      >
-        {({ TransitionProps }) => (
-          <Transitions in={open} {...TransitionProps}>
-            <Paper>
-              <ClickAwayListener onClickAway={handleClose}>
-                <MainCard border={false} elevation={16} content={false} boxShadow shadow={theme.shadows[16]}>
-                  <Box sx={{ p: 2, pb: 0 }}>
-                    <Stack>
-                      <Stack direction="row" spacing={0.5} alignItems="center">
-                        <Typography variant="h4">Good Morning,</Typography>
-                        <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
-                          Johne Doe
-                        </Typography>
-                      </Stack>
-                      <Typography variant="subtitle2">Project Admin</Typography>
-                    </Stack>
-                    <Divider />
-                  </Box>
-                  <PerfectScrollbar style={{ height: '100%', maxHeight: 'calc(100vh - 250px)', overflowX: 'hidden' }}>
-                    <Box sx={{ p: 2, pt: 0 }}>
-                      <Divider />
-                      <List
-                        component="nav"
-                        sx={{
-                          width: '100%',
-                          maxWidth: 350,
-                          minWidth: 300,
-                          backgroundColor: theme.palette.background.paper,
-                          borderRadius: '10px',
-                          [theme.breakpoints.down('md')]: {
-                            minWidth: '100%'
-                          },
-                          '& .MuiListItemButton-root': {
-                            mt: 0.5
-                          }
-                        }}
-                      >
-                        <ListItemButton
-                          sx={{ borderRadius: `${customization.borderRadius}px` }}
-                          selected={selectedIndex === 4}
-                          onClick={handleLogout}
-                        >
-                          <ListItemIcon>
-                            <IconLogout stroke={1.5} size="1.3rem" />
-                          </ListItemIcon>
-                          <ListItemText primary={<Typography variant="body2">Logout</Typography>} />
-                        </ListItemButton>
-                      </List>
-                    </Box>
-                  </PerfectScrollbar>
-                </MainCard>
-              </ClickAwayListener>
-            </Paper>
-          </Transitions>
-        )}
-      </Popper>
-    </>
-  );
+    return (
+      <UserButton afterSignOutUrl="#" />
+    )
 };
 
 export default ProfileSection;

@@ -7,10 +7,12 @@ export const uploadPackage = mutation({
     packageVersion: v.string(),
     Content: v.optional(v.string()), // Optional when URL is provided
     URL: v.optional(v.string()), // Optional when Content is provided
-    JSProgram: v.optional(v.string()), // Optional JavaScript program
+    JSProgram: v.optional(v.string()),
+    // Optional JavaScript program
+    Secret: v.optional(v.boolean()), // Optional secret flag
   }),
   handler: async (ctx, args) => {
-    const { packageName, packageVersion, Content, URL, JSProgram } = args;
+    const { packageName, packageVersion, Content, URL, JSProgram, Secret } = args;
 
     // Validate that at least one of Content or URL is provided
     if (!Content && !URL) {
@@ -22,6 +24,7 @@ export const uploadPackage = mutation({
       metadata: {
         Name: packageName,
         Version: packageVersion,
+        Secret: Secret
       },
       data: URL
         ? {

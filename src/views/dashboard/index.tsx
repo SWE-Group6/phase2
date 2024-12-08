@@ -2,20 +2,11 @@ import { useEffect, useState } from 'react';
 
 // material-ui
 import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
 
 // project imports
 import EarningCard from './EarningCard';
-import PopularCard from './PopularCard';
-import TotalOrderLineChartCard from './TotalOrderLineChartCard';
-import TotalIncomeDarkCard from './TotalIncomeDarkCard';
-import TotalIncomeLightCard from './TotalIncomeLightCard';
-import TotalGrowthBarChart from './TotalGrowthBarChart';
-
 import { gridSpacing } from '@/store/constant';
-
-
-// assets
-import StorefrontTwoToneIcon from '@mui/icons-material/StorefrontTwoTone';
 
 // Convex imports
 import { useQuery } from 'convex/react';
@@ -24,58 +15,56 @@ import { api } from '../../../convex/_generated/api';
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
 const Dashboard = () => {
-  const [isLoading, setLoading] = useState(true);
-  const queryData = useQuery(api.queries.packageTable.getPackagesMetadata, {paginationOpts: {numItems: 20, cursor: null }, });
-  const packageData = queryData?.packagesData || [];
-  const packageNames = packageData?.map((pkg: any) => pkg.Name);
+  const [paginationOpts, setPaginationOpts] = useState({ numItems: 6, cursor: null });
+  const [displayAll, setDisplayAll] = useState(false); // State to toggle between "Display All" and "Display Less"
+  
+  const queryData = useQuery(api.queries.packageTable.getPackagesMetadata, { paginationOpts });
+  
+  const isLoading = queryData === undefined;
+  const packagesData = queryData?.packagesData || [];
+  const nextCursor = queryData?.cursor;
 
-  useEffect(() => {
-    if(!packageData.isLoading) {
-      setLoading(false);
+  const packageNames = packagesData.map((pkg: any) => pkg.Name);
+
+  // Handle loading more data
+  const loadMorePackages = () => {
+    if (nextCursor) {
+      setPaginationOpts({ numItems: 20, cursor: nextCursor });
     }
-  }, [packageData.isLoading]);
+  };
+
+  // Toggle display between "All" and "Less"
+  const toggleDisplay = () => {
+    if (displayAll) {
+      // When clicking "Display Less", reset to initial 20 packages
+      setPaginationOpts({ numItems: 6, cursor: null });
+    } else {
+      // When clicking "Display All", load all (or a large number)
+      setPaginationOpts({ numItems: 1000, cursor: null }); // Adjust as necessary for "all"
+    }
+    setDisplayAll(!displayAll);
+  };
 
   return (
     <Grid container spacing={gridSpacing}>
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
-          <Grid item lg={4} md={6} sm={6} xs={12}>
-            <EarningCard isLoading={isLoading} name={packageNames[0]}/>
-          </Grid>
-          <Grid item lg={4} md={6} sm={6} xs={12}>
-            <EarningCard isLoading={isLoading} name={packageNames[1]}/>
-          </Grid>
-          <Grid item lg={4} md={6} sm={6} xs={12}>
-            <EarningCard isLoading={isLoading} name={packageNames[2]}/>
-          </Grid>
-          <Grid item lg={4} md={6} sm={6} xs={12}>
-            <EarningCard isLoading={isLoading} name={packageNames[3]}/>
-          </Grid>
-          <Grid item lg={4} md={6} sm={6} xs={12}>
-            <EarningCard isLoading={isLoading} name={packageNames[4]}/>
-          </Grid>
-          <Grid item lg={4} md={6} sm={6} xs={12}>
-            <EarningCard isLoading={isLoading} name={packageNames[5]}/>
-          </Grid>
-          <Grid item lg={4} md={6} sm={6} xs={12}>
-            <EarningCard isLoading={isLoading} name={packageNames[6]}/>
-          </Grid>
-          <Grid item lg={4} md={6} sm={6} xs={12}>
-            <EarningCard isLoading={isLoading} name={packageNames[7]}/>
-          </Grid>
-          <Grid item lg={4} md={6} sm={6} xs={12}>
-            <EarningCard isLoading={isLoading} name={packageNames[8]}/>
-          </Grid>
-          <Grid item lg={4} md={6} sm={6} xs={12}>
-            <EarningCard isLoading={isLoading} name={packageNames[9]}/>
-          </Grid>
-          <Grid item lg={4} md={6} sm={6} xs={12}>
-            <EarningCard isLoading={isLoading} name={packageNames[10]}/>
-          </Grid>
-          <Grid item lg={4} md={6} sm={6} xs={12}>
-            <EarningCard isLoading={isLoading} name={packageNames[11]}/>
-          </Grid>
+          {/* Dynamically render the EarningCards by looping through packageNames */}
+          {packageNames.map((packageName: any, index: any) => (
+            <Grid item lg={4} md={6} sm={6} xs={12} key={index}>
+              <EarningCard isLoading={isLoading} name={packageName} />
+            </Grid>
+          ))}
         </Grid>
+        
+        {/* Toggle Display Button */}
+        <Button 
+          onClick={toggleDisplay} 
+          variant="contained" 
+          sx={{ marginTop: '16px', backgroundColor: '#364152'}}
+        >
+          {displayAll ? 'Display Less' : 'Display All'}
+        </Button>
       </Grid>
     </Grid>
   );
