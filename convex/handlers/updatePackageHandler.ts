@@ -12,7 +12,7 @@ export const updatePackageHandler = httpAction(async (ctx, request) => {
         const URL = body.data.URL;
         const debloat = body.data.debloat;
         const JSProgram = body.data.JSProgram;
-
+        const Secret = body.metadata.Secret || false;
 
         if (!Name || !Version || !ID) {
             return new Response(
@@ -30,6 +30,7 @@ export const updatePackageHandler = httpAction(async (ctx, request) => {
                     Name,
                     ID,
                     Version,
+                    Secret
                 }
             });
         }
@@ -42,6 +43,7 @@ export const updatePackageHandler = httpAction(async (ctx, request) => {
                     Name,
                     ID,
                     Version,
+                    Secret
                 }
             });
         }
@@ -50,7 +52,7 @@ export const updatePackageHandler = httpAction(async (ctx, request) => {
             return new Response(
                 JSON.stringify({
                     error: result.metadata.message,
-                    metadata: result.metadata,
+                    metadata: result,
                 }),
                 { status: result.metadata.code || 400 } // Use code from the response or default to 400.
             );

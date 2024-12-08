@@ -3,7 +3,7 @@ import { action, ActionCtx, httpAction } from "../_generated/server";
 import { qualifyPackage } from "../actions/qualifyPackage";
 import { createClerkClient } from '@clerk/backend'
 
-const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })
+
 
 /*
 Explanation on Packages can be marked as secret:
@@ -24,30 +24,8 @@ export const uploadPackageHandler = httpAction(async (ctx, request) => {
         console.log('URL:', URL);
         console.log('JSProgram:', JSProgram);
         console.log('debloat:', debloat);
-        const identity = await ctx.auth.getUserIdentity();
-        console.log("Secret: " , Secret);
-        console.log('Identity:', identity);
-        const organizationId = "org_2plow6YcQeyrrUQEzl72EzJQmDA"
-        const orgList = await clerkClient.organizations.getOrganizationMembershipList({ organizationId }) 
-        console.log('OrgList:', orgList);
-        const userEmail = identity?.email;
-
-        // Check if the user's email is in the orgList
-        const isUserInOrg = orgList.data.some((membership) => membership.publicUserData?.identifier === userEmail);
-
-        if (isUserInOrg) {
-        console.log(`User with email ${userEmail} is in the organization.`);
-        } else {
-        console.log(`User with email ${userEmail} is NOT in the organization.`);
-        }
-        if (Secret && !isUserInOrg) {
-            //check if the secret is set by the member of the org: org_2plow6YcQeyrrUQEzl72EzJQmDA using clerk
-            return new Response(
-                JSON.stringify({ error: "Unauthorized access. User Cannot set the Secret variable " }),
-                { status: 403 } // Forbidden
-            );
-            
-        }
+        console.log("Secret: ", Secret);
+        
 
 		if ((Content && URL) || (!Content && !URL)) {
 			return new Response(
