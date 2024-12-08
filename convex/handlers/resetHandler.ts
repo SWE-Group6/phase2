@@ -10,5 +10,5 @@ export const resetHandler = httpAction(async (ctx, request) => {
 
             } catch (error: any) {
                 return new Response(error.message, { status: error.status || 404 })
-            }
+    }
 });

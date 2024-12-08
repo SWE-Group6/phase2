@@ -56,7 +56,7 @@ http.route({
 });
 
 http.route({
-	path: "/update_package", // TODO update path accordingly.
+	pathPrefix: "/package/", // TODO update path accordingly.
 	method: "POST",
 	handler: updatePackageHandler,
 });
