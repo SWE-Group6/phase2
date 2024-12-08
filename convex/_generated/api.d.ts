@@ -20,11 +20,13 @@ import type * as handlers_authenticateHandler from "../handlers/authenticateHand
 import type * as handlers_packageByRegexHandlers from "../handlers/packageByRegexHandlers.js";
 import type * as handlers_packageHandlers from "../handlers/packageHandlers.js";
 import type * as handlers_packageIdHandlers from "../handlers/packageIdHandlers.js";
+import type * as handlers_resetHandler from "../handlers/resetHandler.js";
 import type * as handlers_trackHandlers from "../handlers/trackHandlers.js";
 import type * as handlers_trial from "../handlers/trial.js";
 import type * as handlers_updatePackageHandler from "../handlers/updatePackageHandler.js";
 import type * as handlers_uploadPackageHandler from "../handlers/uploadPackageHandler.js";
 import type * as http from "../http.js";
+import type * as mutation_packageTable from "../mutation/packageTable.js";
 import type * as mutations_uploadPackage from "../mutations/uploadPackage.js";
 import type * as myFunctions from "../myFunctions.js";
 import type * as package_rate_Models_AllMetrics from "../package_rate/Models/AllMetrics.js";
@@ -55,11 +57,13 @@ declare const fullApi: ApiFromModules<{
   "handlers/packageByRegexHandlers": typeof handlers_packageByRegexHandlers;
   "handlers/packageHandlers": typeof handlers_packageHandlers;
   "handlers/packageIdHandlers": typeof handlers_packageIdHandlers;
+  "handlers/resetHandler": typeof handlers_resetHandler;
   "handlers/trackHandlers": typeof handlers_trackHandlers;
   "handlers/trial": typeof handlers_trial;
   "handlers/updatePackageHandler": typeof handlers_updatePackageHandler;
   "handlers/uploadPackageHandler": typeof handlers_uploadPackageHandler;
   http: typeof http;
+  "mutation/packageTable": typeof mutation_packageTable;
   "mutations/uploadPackage": typeof mutations_uploadPackage;
   myFunctions: typeof myFunctions;
   "package_rate/Models/AllMetrics": typeof package_rate_Models_AllMetrics;
