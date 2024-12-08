@@ -30,7 +30,7 @@ export const getPackageByRegexHTTPHandler = httpAction(async (ctx, request) => {
         let finalList = {};
         if (isUserInOrg) {
         console.log(`User with email ${userEmail} is in the organization.`);
-        finalList = result;
+        finalList = result; 
         } else {
         console.log(`User with email ${userEmail} is NOT in the organization.`);
         //filter out the secret packages if the user is not in the org
