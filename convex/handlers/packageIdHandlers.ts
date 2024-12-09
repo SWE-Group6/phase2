@@ -1,9 +1,10 @@
 import { api } from "../_generated/api";
 import { ActionCtx, httpAction } from "../_generated/server";
+import axios from "axios";
 import { Package } from "../package_rate/Models/Package"
 import { createClerkClient } from "@clerk/backend";
 
-
+let dependency = false;
 // Function to generate a response based on the action
 const generateResponse = async (action: string, pkg: any) => {
   if (action === 'rate') {
@@ -13,6 +14,14 @@ const generateResponse = async (action: string, pkg: any) => {
       return new Response(metrics.error, { status: 500 });
     }
     return new Response(JSON.stringify(metrics), { status: 200 });
+  }
+  if (action === 'cost') {
+    const packageName = pkg["metadata"]["Name"];
+    const cost = await findPackageCost(packageName, dependency);
+    if ('error' in cost) {
+      return new Response(cost.error, { status: 500 });
+    }
+    return new Response(JSON.stringify(cost), { status: 200 });
   } else {
     if (!pkg) {
       console.log('Package not found.');
@@ -51,6 +60,10 @@ export const getPackageByIdHTTPHandler = httpAction(async (ctx, request) => {
   const action = pathParts[3]; // This should be "rate"
   console.log('packageId:', packageId);
 
+  // Determines if dependencies will be included or not and sets global variable accordingly
+  const dependencyConditionString = new URLSearchParams(url.search).get('dependency');
+  dependency = dependencyConditionString === 'true';
+
   if (!packageId) {
     return new Response(
       "Package ID not specified in the URL path",
@@ -86,5 +99,29 @@ export const ratePackage = async (packageUrl: string) => {
   catch (error) {
     console.error('The package rating system choked on at least one of the metrics.:', error);
     return { error: 'Failed to fetch metrics' };
+  }
+}
+
+export const findPackageCost = async (packageName: string, dependencyVal: boolean) => {
+  try {
+    const packageData = await axios.get(`https://bundlephobia.com/api/size?package=${packageName}`);
+    const mainPackageSize = packageData.data;
+
+    const filteredPackage = {
+      packageName: mainPackageSize.name,
+      packageSize: `${(mainPackageSize.size / 1024).toFixed(2)} KB`,
+      dependencies: dependencyVal ? mainPackageSize.dependencySizes
+        .filter((dep: { name: string; approximateSize: number; }) => dep.name !== mainPackageSize.name)
+        .map((dep: { name: string; approximateSize: number; }) => ({
+          name: dep.name,
+          size: `${(dep.approximateSize / 1024).toFixed(2)} KB`
+        })) : []
+    };
+
+    return filteredPackage;
+
+  } catch (error) {
+    console.error('Error fetching package or dependencies size:', error);
+    return { error: 'Failed to fetch package data' };
   }
 }
