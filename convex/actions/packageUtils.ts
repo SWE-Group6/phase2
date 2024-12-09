@@ -12,7 +12,7 @@
 
 import { Buffer } from "buffer";
 import AdmZip, { IZipEntry } from "adm-zip"; // https://www.npmjs.com/package/adm-zip
-import { createHash } from "crypto"; 
+import { createHash } from "crypto";
 import axios from 'axios';
 
 // a. begin by decoding the base64 content.
@@ -51,7 +51,7 @@ function minifyFiles(zip: AdmZip): AdmZip {
 		if (!entry.isDirectory && (entry.entryName.endsWith(".ts") || entry.entryName.endsWith(".json") || entry.entryName.endsWith(".html"))) {
 			const originalContent = entry.getData().toString("utf-8");
 			const minifiedContent = stripComments(originalContent);
-			
+
 			zip.updateFile(entry.entryName, Buffer.from(minifiedContent, "utf-8"));
 		}
 	});
@@ -143,39 +143,39 @@ export function debloatBase64Package(base64String: string): string {
 }
 
 export function findPackageJson(zip: AdmZip): IZipEntry | null {
-  const entries = zip.getEntries();
+	const entries = zip.getEntries();
 
-  for (const entry of entries) {
-    // We are looking for any file named 'package.json', regardless of its location.
-    if (entry.entryName.endsWith("package.json")) {
-      return entry; // Return the entry if found.
-    }
-  }
+	for (const entry of entries) {
+		// We are looking for any file named 'package.json', regardless of its location.
+		if (entry.entryName.endsWith("package.json")) {
+			return entry; // Return the entry if found.
+		}
+	}
 
-  console.error("Could not find package.json in the zip file.");
-  return null; // Return null if package.json is not found.
+	console.error("Could not find package.json in the zip file.");
+	return null; // Return null if package.json is not found.
 }
 
 export function extractVersionFromPackage(packageJsonEntry: IZipEntry): string | null {
-  if (!packageJsonEntry) {
-    return null; // Return null if package.json is not found.
-  }
+	if (!packageJsonEntry) {
+		return null; // Return null if package.json is not found.
+	}
 
-  // Read the content of package.json
-  const packageJsonContent = packageJsonEntry.getData().toString("utf-8");
+	// Read the content of package.json
+	const packageJsonContent = packageJsonEntry.getData().toString("utf-8");
 
-  try {
-    console.log("package.json content:", packageJsonContent); // Debugging log to see the content
-    // Parse JSON and extract the version field
-    const packageJson = JSON.parse(packageJsonContent);
-    return packageJson.version || null; // Return version if it exists.
-  } catch (error) {
-    console.error("Error parsing package.json:", error);
-    return null; // Return null if parsing fails.
-  }
+	try {
+		console.log("package.json content:", packageJsonContent); // Debugging log to see the content
+		// Parse JSON and extract the version field
+		const packageJson = JSON.parse(packageJsonContent);
+		return packageJson.version || null; // Return version if it exists.
+	} catch (error) {
+		console.error("Error parsing package.json:", error);
+		return null; // Return null if parsing fails.
+	}
 }
 
-export async function getRepoInfo(URL: string): Promise< { owner: string, repo: string } | null> {
+export async function getRepoInfo(URL: string): Promise<{ owner: string, repo: string } | null> {
 	if (URL.includes('github.com')) {
 		const parts = URL.split('/');
 		const owner = parts[3];
@@ -206,37 +206,36 @@ export async function downloadPackageBlob(owner: string, repo: string): Promise<
 	// Step 1: Get the default branch of the repository
 	const response = await axios.get(`https://api.github.com/repos/${owner}/${repo}`);
 	const defaultBranch = response.data.default_branch;
-  
+
 	// Step 2: Construct the URL for the zip file
 	const zipURL = `https://github.com/${owner}/${repo}/archive/refs/heads/${defaultBranch}.zip`;
-  
+
 	console.log("Downloading package from:", zipURL);
 	// Step 3: Fetch the zip file as an array buffer
 	const zipResponse = await axios.get(zipURL, { responseType: "arraybuffer" });
-  
+
 	// Step 4: Convert the array buffer to a Blob
 	const zipBlob = new Blob([zipResponse.data], { type: "application/zip" });
-  
+
 	return zipBlob; // Return the Blob
-  }
-  
+}
+
 export function base64ToBlob(base64: string, mimeType: string = 'application/zip'): Blob {
 	// Remove the data URL prefix if present
 	const base64Clean = base64.replace(/^data:.*\/.*;base64,/, '');
-	
+
 	// Decode the base64 string to binary
 	const byteCharacters = atob(base64Clean);
-	
+
 	// Convert binary string to byte array
 	const byteNumbers = new Array(byteCharacters.length);
 	for (let i = 0; i < byteCharacters.length; i++) {
-	  byteNumbers[i] = byteCharacters.charCodeAt(i);
+		byteNumbers[i] = byteCharacters.charCodeAt(i);
 	}
-	
+
 	// Create Uint8Array from byte numbers
 	const byteArray = new Uint8Array(byteNumbers);
-	
+
 	// Create and return Blob
 	return new Blob([byteArray], { type: mimeType });
-  }
-  
+}

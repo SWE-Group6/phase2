@@ -28,14 +28,14 @@ export const uploadPackage = mutation({
       },
       data: URL
         ? {
-            URL,
-            Content: Content || "", // Empty string when URL is used
-            JSProgram: JSProgram || "", // Default to empty string if not provided
-          }
+          URL,
+          Content: Content || "", // Empty string when URL is used
+          JSProgram: JSProgram || "", // Default to empty string if not provided
+        }
         : {
-            Content: Content!, // Content is required if URL is not provided
-            JSProgram: JSProgram || "", // Default to empty string if not provided
-          },
+          Content: Content!, // Content is required if URL is not provided
+          JSProgram: JSProgram || "", // Default to empty string if not provided
+        },
     };
 
     // Insert the package into the database and return its unique ID
