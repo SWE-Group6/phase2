@@ -24,8 +24,6 @@ const Dashboard = () => {
   const packagesData = queryData?.packagesData || [];
   const nextCursor = queryData?.cursor;
 
-  const packageNames = packagesData.map((pkg: any) => pkg.Name);
-
   // Handle loading more data
   const loadMorePackages = () => {
     if (nextCursor) {
@@ -50,9 +48,9 @@ const Dashboard = () => {
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
           {/* Dynamically render the EarningCards by looping through packageNames */}
-          {packageNames.map((packageName: any, index: any) => (
+          {packagesData.map((pkg: any, index: any) => (
             <Grid item lg={4} md={6} sm={6} xs={12} key={index}>
-              <EarningCard isLoading={isLoading} name={packageName} />
+              <EarningCard isLoading={isLoading} name={pkg.Name} version={pkg.Version} id="diwjdowoaidminiawdmw"/>
             </Grid>
           ))}
         </Grid>
