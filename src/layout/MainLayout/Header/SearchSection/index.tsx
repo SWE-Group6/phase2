@@ -50,9 +50,7 @@ const HeaderAvatar = forwardRef<HTMLDivElement, { children: React.ReactNode }>(
     }
   );
 
-HeaderAvatar.propTypes = {
-  children: PropTypes.node
-};
+
 
 // ==============================|| SEARCH INPUT - MOBILE||============================== //
 
@@ -112,11 +110,7 @@ MobileSearch.propTypes = {
 
 const SearchSection = () => {
   const [value, setValue] = useState('');
-
-  const getPackage = () => {
-    const packageData = useQuery(api.queries.packageTable.getPackageByRegex, {regex: ".*?package2.*"});
-    console.log(JSON.stringify(packageData));
-  }
+  const packageData = useQuery(api.queries.packageTable.getPackageByRegex, {regex: `.*?${value}.*`});
 
   const handleInput = (newValue: string) => {
     setValue(newValue);
@@ -124,7 +118,9 @@ const SearchSection = () => {
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter') {
-      getPackage();
+      console.log("entered");
+      
+      console.log(JSON.stringify(value));
     }
   }
 
