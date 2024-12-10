@@ -38,7 +38,7 @@ const Dashboard = () => {
       setPaginationOpts({ numItems: 6, cursor: null });
     } else {
       // When clicking "Display All", load all (or a large number)
-      setPaginationOpts({ numItems: 1000, cursor: null }); // Adjust as necessary for "all"
+      setPaginationOpts({ numItems: 1000, cursor: null }); 
     }
     setDisplayAll(!displayAll);
   };
@@ -50,7 +50,7 @@ const Dashboard = () => {
           {/* Dynamically render the EarningCards by looping through packageNames */}
           {packagesData.map((pkg: any, index: any) => (
             <Grid item lg={4} md={6} sm={6} xs={12} key={index}>
-              <EarningCard isLoading={isLoading} name={pkg.Name} version={pkg.Version} id="diwjdowoaidminiawdmw"/>
+              <EarningCard isLoading={isLoading} name={pkg.Name} version={pkg.Version} id={pkg.ID}/>
             </Grid>
           ))}
         </Grid>

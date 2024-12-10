@@ -7,7 +7,7 @@ const ResetButtonPage: React.FC = () => {
 
   const handleClick = async () => {
     try {
-      const token = await getToken();
+      const token = await getToken({template: "convex"});
 
       const response = await fetch(`/api/reset`, {
         method: "DELETE",

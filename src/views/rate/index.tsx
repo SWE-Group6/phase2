@@ -18,7 +18,7 @@ export default function Rate() {
 
     if (trimmedPackageID) {
       try {
-        const token = await getToken();
+        const token = await getToken({template: "convex"});
 
         const response = await fetch(`/api/package/${trimmedPackageID}/rate`, {
           method: "GET",
@@ -74,8 +74,8 @@ export default function Rate() {
           <Typography variant="h6">Package Metrics</Typography>
           <Card sx={{ maxWidth: 400, marginTop: 2 }}>
             <CardContent>
-              <Typography variant="body1"><strong>Package ID:</strong> {metrics.packageID}</Typography>
-              <Typography variant="body1"><strong>Metric Values:</strong> {metrics.metricValue}</Typography>
+              <Typography variant="body1"><strong>Package ID:</strong> {packageID}</Typography>
+              <Typography variant="body1"><strong>Metric Values:</strong> {metrics.NetScore}</Typography>
             </CardContent>
           </Card>
         </Box>

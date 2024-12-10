@@ -21,45 +21,18 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 const EarningCard = ({
   isLoading,
   name,
-  version, // New prop for version
-  id, // New prop for ID
+  version, // Version prop
+  id, // ID prop
 }: {
   isLoading: boolean;
   name: string;
-  version: string; // New prop type
-  id: string; // New prop type
+  version: string;
+  id: string;
 }) => {
   const theme: any = useTheme();
 
   // State for toggling the visibility of the information box
   const [showInfo, setShowInfo] = React.useState(false);
-
-  // State for displaying fetched information
-  const [fetchedInfo, setFetchedInfo] = React.useState<any | null>(null);
-  const [isFetching, setIsFetching] = React.useState(false);
-
-  // Mock query function to simulate data fetching
-  const fetchData = async () => {
-    setIsFetching(true);
-
-    // Simulated delay to mimic a query call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Replace this with actual data fetched from your query
-    const pseudoData = {
-      usageCount: 150,
-      lastUpdated: '2024-12-01',
-      activeUsers: 32,
-    };
-
-    setFetchedInfo(pseudoData);
-    setIsFetching(false);
-  };
-
-  React.useEffect(() => {
-    // Automatically fetch data when the component mounts
-    fetchData();
-  }, []);
 
   const handleAvatarClick = () => {
     setShowInfo((prev) => !prev); // Toggle the visibility of the info box
@@ -166,25 +139,15 @@ const EarningCard = ({
                 zIndex: 2,
               }}
             >
-              {isFetching ? (
-                <Typography sx={{ fontSize: '0.875rem', color: theme.palette.grey[900] }}>
-                  Fetching information...
+              <Box>
+                {/* Display version and ID props */}
+                <Typography sx={{ fontSize: '0.875rem', color: theme.palette.grey[900], mb: 1 }}>
+                  <strong>Version:</strong> {version}
                 </Typography>
-              ) : fetchedInfo ? (
-                <Box>
-                  {/* Display new version and id props */}
-                  <Typography sx={{ fontSize: '0.875rem', color: theme.palette.grey[900], mb: 1 }}>
-                    <strong>Version:</strong> {version}
-                  </Typography>
-                  <Typography sx={{ fontSize: '0.875rem', color: theme.palette.grey[900] }}>
-                    <strong>ID:</strong> {id}
-                  </Typography>
-                </Box>
-              ) : (
-                <Typography sx={{ fontSize: '0.875rem', color: theme.palette.error.main }}>
-                  Failed to load information.
+                <Typography sx={{ fontSize: '0.875rem', color: theme.palette.grey[900], wordWrap: 'break-word' }}>
+                  <strong>ID:</strong> {id}
                 </Typography>
-              )}
+              </Box>
             </Box>
           )}
         </MainCard>
@@ -195,9 +158,9 @@ const EarningCard = ({
 
 EarningCard.propTypes = {
   isLoading: PropTypes.bool,
-  name: PropTypes.string,
-  version: PropTypes.string, // Added version prop type
-  id: PropTypes.string, // Added id prop type
+  name: PropTypes.string.isRequired,
+  version: PropTypes.string.isRequired, // Version prop type
+  id: PropTypes.string.isRequired, // ID prop type
 };
 
 export default EarningCard;

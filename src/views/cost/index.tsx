@@ -18,9 +18,9 @@ export default function Cost() {
 
     if (trimmedPackageID) {
       try {
-        const token = await getToken();
+        const token = await getToken({template: "convex"});
 
-        const response = await fetch(`/api/package/${trimmedPackageID}/cost`, {
+        const response = await fetch(`/api/package/${trimmedPackageID}/cost?dependency=false`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -33,7 +33,10 @@ export default function Cost() {
         }
 
         const data = await response.json();
-        setCost(data);
+        const cost_in_mb = parseInt(data.packageSize)/1024;
+        console.log(cost_in_mb);
+
+        setCost(cost_in_mb);
       } catch (error) {
         console.error("Error fetching data:", error);
         setError('Failed to fetch the data. Please try again.');
@@ -71,11 +74,11 @@ export default function Cost() {
 
       {cost && (
         <Box sx={{ marginTop: 3 }}>
-          <Typography variant="h6">Package Metrics</Typography>
+          <Typography variant="h6">Package Cost</Typography>
           <Card sx={{ maxWidth: 400, marginTop: 2 }}>
             <CardContent>
-              <Typography variant="body1"><strong>Package ID:</strong> {cost.packageID}</Typography>
-              <Typography variant="body1"><strong>Metric Values:</strong> {cost.metricValue}</Typography>
+              <Typography variant="body1"><strong>Package ID:</strong> {packageID}</Typography>
+              <Typography variant="body1"><strong>Package Cost:</strong> {cost} MB</Typography>
             </CardContent>
           </Card>
         </Box>

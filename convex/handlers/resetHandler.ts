@@ -12,8 +12,8 @@ export const resetHandler = httpAction(async (ctx, request) => {
     const orgList = await clerkClient.organizations.getOrganizationMembershipList({ organizationId });
     console.log('OrgList:', orgList);
     //check if the user has the role:admin in the org
-    const isAdmin = orgList.data.some((membership: any) => 
-        (membership.publicUserData?.identifier === identity?.email || membership.publicUserData?.userId === userId) && 
+    const isAdmin = orgList.data.some((membership: any) =>
+        (membership.publicUserData?.identifier === identity?.email || membership.publicUserData?.userId === userId) &&
         membership.role === 'org:admin'
     );
     console.log('isAdmin:', isAdmin);
@@ -23,7 +23,7 @@ export const resetHandler = httpAction(async (ctx, request) => {
     try {
         await ctx.runMutation(api.mutations.packageTable.clearTable);
         // get a list of all the users from clerk and delete them one by one
-        
+
 
         const userList = await clerkClient.users.getUserList(); // Fetch the list of users
         const users = userList.data; // Access the data property to get the user array
@@ -48,7 +48,7 @@ export const resetHandler = httpAction(async (ctx, request) => {
 
         return new Response(JSON.stringify({}));
 
-            } catch (error: any) {
-                return new Response(error.message, { status: error.status || 404 })
+    } catch (error: any) {
+        return new Response(error.message, { status: error.status || 404 })
     }
 });
