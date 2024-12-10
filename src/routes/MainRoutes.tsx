@@ -3,6 +3,7 @@ import { lazy } from 'react';
 // project imports
 import MainLayout from '@/layout/MainLayout';
 import Loadable from '@/components/Loadable';
+import Cost from '@/views/cost';
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('@/views/dashboard')));
@@ -12,7 +13,7 @@ const UploadPage = Loadable(lazy(() => import('@/views/upload')));
 const UpdatePage = Loadable(lazy(() => import('@/views/update')));
 const RatePage = Loadable(lazy(() => import('@/views/rate')));
 const ResetPage = Loadable(lazy(() => import('@/views/reset')));
-
+const CostPage = Loadable(lazy(() => import('@/views/cost')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -57,6 +58,15 @@ const MainRoutes = {
         {
           path: 'rate',
           element: <RatePage />
+        }
+      ]
+    },
+    {
+      path: 'actions',
+      children: [
+        {
+          path: 'cost',
+          element: <CostPage />
         }
       ]
     },

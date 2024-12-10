@@ -42,6 +42,13 @@ const pages = {
                     breadcrumbs: false
                 },
                 {
+                    id: 'cost',
+                    title: 'Cost',
+                    type: 'item',
+                    url: '/actions/cost',
+                    breadcrumbs: false
+                },
+                {
                     id: 'reset',
                     title: 'Reset',
                     type: 'item',

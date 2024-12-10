@@ -7,9 +7,9 @@ import InputLabel from '@mui/material/InputLabel';
 import { Button, Card, CardContent } from '@mui/material';
 import { useAuth } from '@clerk/clerk-react';
 
-export default function Rate() {
+export default function Cost() {
   const [packageID, setPackageID] = React.useState<string>('');
-  const [metrics, setMetrics] = React.useState<any | null>(null);
+  const [cost, setCost] = React.useState<any | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const { getToken } = useAuth();
 
@@ -20,7 +20,7 @@ export default function Rate() {
       try {
         const token = await getToken();
 
-        const response = await fetch(`/api/package/${trimmedPackageID}/rate`, {
+        const response = await fetch(`/api/package/${trimmedPackageID}/cost`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -33,7 +33,7 @@ export default function Rate() {
         }
 
         const data = await response.json();
-        setMetrics(data);
+        setCost(data);
       } catch (error) {
         console.error("Error fetching data:", error);
         setError('Failed to fetch the data. Please try again.');
@@ -69,13 +69,13 @@ export default function Rate() {
         Submit
       </Button>
 
-      {metrics && (
+      {cost && (
         <Box sx={{ marginTop: 3 }}>
           <Typography variant="h6">Package Metrics</Typography>
           <Card sx={{ maxWidth: 400, marginTop: 2 }}>
             <CardContent>
-              <Typography variant="body1"><strong>Package ID:</strong> {metrics.packageID}</Typography>
-              <Typography variant="body1"><strong>Metric Values:</strong> {metrics.metricValue}</Typography>
+              <Typography variant="body1"><strong>Package ID:</strong> {cost.packageID}</Typography>
+              <Typography variant="body1"><strong>Metric Values:</strong> {cost.metricValue}</Typography>
             </CardContent>
           </Card>
         </Box>
