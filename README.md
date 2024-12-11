@@ -19,3 +19,10 @@ To get the project running locally:
 1. Clone the repository:
    ```bash
    git clone <repository-url>
+
+2. Navigate into the project directory:
+   ```bash
+   cd <repo_name>
+3. Install the necessary dependencies:
+   ```bash
+   npm install
