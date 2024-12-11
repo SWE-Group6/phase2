@@ -1,48 +1,60 @@
-import { expect } from 'chai';
-import { ResponsiveMaintainer } from '../Models/ResponsiveMaintainer';
+import { convexTest } from "convex-test";
+import { expect, test, describe, beforeEach } from "vitest";
+import schema from "../../schema"; // Assuming schema is defined for Convex
 
-describe('ResponsiveMaintainer', () => {
-  let responsiveMaintainerGithub: ResponsiveMaintainer;
-  let responsiveMaintainerNPM: ResponsiveMaintainer;
+// Importing the ResponsiveMaintainer class for testing
+import { ResponsiveMaintainer } from "../Models/ResponsiveMaintainer";
 
-  beforeEach(() => {
-    responsiveMaintainerGithub = new ResponsiveMaintainer('https://github.com/cloudinary/cloudinary_npm');
-    responsiveMaintainerNPM = new ResponsiveMaintainer('https://www.npmjs.com/package/bootstrap');
-  });
+let responsiveMaintainerGithub: ResponsiveMaintainer;
+let responsiveMaintainerNPM: ResponsiveMaintainer;
 
-  describe('GitHub', () => {
-    it('should calculate the ResponsiveMaintainer score', async () => {
+beforeEach(() => {
+  responsiveMaintainerGithub = new ResponsiveMaintainer("https://github.com/cloudinary/cloudinary_npm");
+  responsiveMaintainerNPM = new ResponsiveMaintainer("https://www.npmjs.com/package/bootstrap");
+});
+
+describe("ResponsiveMaintainer", () => {
+  describe("GitHub", () => {
+    test("Calculate the ResponsiveMaintainer score", async () => {
+      const t = convexTest(schema);
       await responsiveMaintainerGithub.calculateScoreGithub();
-      expect(responsiveMaintainerGithub.getScore()).to.be.within(0, 1);
+      expect(responsiveMaintainerGithub.getScore()).toBeGreaterThanOrEqual(0);
+      expect(responsiveMaintainerGithub.getScore()).toBeLessThanOrEqual(1);
     });
 
-    it('should calculate the latency for ResponsiveMaintainer', async () => {
+    test("Calculate the latency for ResponsiveMaintainer", async () => {
+      const t = convexTest(schema);
       await responsiveMaintainerGithub.calculateScoreGithub();
-      expect(responsiveMaintainerGithub.getLatency()).to.be.a('number');
+      expect(typeof responsiveMaintainerGithub.getLatency()).toBe("number");
     });
 
-    it('should have a calculateScoreGithub method', () => {
-      expect(responsiveMaintainerGithub.calculateScoreGithub).to.be.a('function');
+    test("Check if calculateScoreGithub method exists", () => {
+      const t = convexTest(schema);
+      expect(typeof responsiveMaintainerGithub.calculateScoreGithub).toBe("function");
     });
 
-    it('should return a score between 0 and 1 after calculation', async () => {
+    test("Return a score between 0 and 1 after calculation", async () => {
+      const t = convexTest(schema);
       await responsiveMaintainerGithub.calculateScoreGithub();
       const score = responsiveMaintainerGithub.getScore();
-      expect(score).to.be.a('number');
-      expect(score).to.be.at.least(0);
-      expect(score).to.be.at.most(1);
+      expect(typeof score).toBe("number");
+      expect(score).toBeGreaterThanOrEqual(0);
+      expect(score).toBeLessThanOrEqual(1);
     });
   });
 
-  describe('NPM', () => {
-    it('should calculate the ResponsiveMaintainer score for NPM', async () => {
+  describe("NPM", () => {
+    test("Calculate the ResponsiveMaintainer score for NPM", async () => {
+      const t = convexTest(schema);
       await responsiveMaintainerNPM.calculateScoreNPM();
-      expect(responsiveMaintainerNPM.getScore()).to.be.within(0, 1);
+      expect(responsiveMaintainerNPM.getScore()).toBeGreaterThanOrEqual(0);
+      expect(responsiveMaintainerNPM.getScore()).toBeLessThanOrEqual(1);
     });
 
-    it('should calculate the latency for ResponsiveMaintainer NPM', async () => {
+    test("Calculate the latency for ResponsiveMaintainer NPM", async () => {
+      const t = convexTest(schema);
       await responsiveMaintainerNPM.calculateScoreNPM();
-      expect(responsiveMaintainerNPM.getLatency()).to.be.a('number');
+      expect(typeof responsiveMaintainerNPM.getLatency()).toBe("number");
     });
   });
-}); // Added closing brace for the main describe block
+});

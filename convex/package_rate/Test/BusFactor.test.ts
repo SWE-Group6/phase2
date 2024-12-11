@@ -1,21 +1,30 @@
-import { expect } from 'chai';
-import { BusFactor } from '../Models/BusFactor';
+import { convexTest } from "convex-test";
+import { expect, test } from "vitest";
+import schema from "../../schema"; // Assuming schema is defined for Convex
 
-describe('BusFactor', () => {
-  it('should calculate the BusFactor score', async () => {
-    const busFactor = new BusFactor('https://github.com/cloudinary/cloudinary_npm');
-    await busFactor.calculateScoreGithub();
-    expect(busFactor.getScore()).to.be.within(0, 1);
-  });
+// Importing the BusFactor class for testing
+import { BusFactor } from "../Models/BusFactor";
 
-  it('should calculate the latency for BusFactor', async () => {
-    const busFactor = new BusFactor('https://github.com/cloudinary/cloudinary_npm');
-    await busFactor.calculateScoreGithub();
-    expect(busFactor.getLatency()).to.be.a('number');
-  });
+test("BusFactor - Calculate BusFactor score", async () => {
+  const t = convexTest(schema);
+  const busFactor = new BusFactor("https://github.com/cloudinary/cloudinary_npm");
 
-  it('should be an instance of BusFactor', () => {
-    const busFactor = new BusFactor('https://github.com/cloudinary/cloudinary_npm');
-    expect(busFactor).to.be.an.instanceOf(BusFactor);
-  });
+  await busFactor.calculateScoreGithub(); // Calculate the GitHub score
+  expect(busFactor.getScore()).toBeGreaterThanOrEqual(0); // Score should be >= 0
+  expect(busFactor.getScore()).toBeLessThanOrEqual(1); // Score should be <= 1
+});
+
+test("BusFactor - Calculate latency", async () => {
+  const t = convexTest(schema);
+  const busFactor = new BusFactor("https://github.com/cloudinary/cloudinary_npm");
+
+  await busFactor.calculateScoreGithub(); // Ensure score calculation before checking latency
+  expect(typeof busFactor.getLatency()).toBe("number"); // Latency should be a number
+});
+
+test("BusFactor - Instance check", async () => {
+  const t = convexTest(schema);
+  const busFactor = new BusFactor("https://github.com/cloudinary/cloudinary_npm");
+
+  expect(busFactor).toBeInstanceOf(BusFactor); // Checking instance type
 });
