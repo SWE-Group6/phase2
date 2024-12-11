@@ -25,6 +25,8 @@ export const uploadPackageHandler = httpAction(async (ctx, request) => {
         console.log('JSProgram:', JSProgram);
         console.log('debloat:', debloat);
         console.log("Secret: ", Secret);
+        //print the headers of the request
+        console.log('Headers:', request.headers);
         
 
 		if ((Content && URL) || (!Content && !URL)) {
@@ -33,8 +35,6 @@ export const uploadPackageHandler = httpAction(async (ctx, request) => {
 				{ status: 400 } // Bad request
 			);
 		} 
-
-        //if Secret is undefined, then set it to false
 
 
         let result;
