@@ -18,11 +18,11 @@ To get the project running locally:
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/SWE-Group6/phase2.git
 
 2. Navigate into the project directory:
    ```bash
-   cd <repo_name>
+   cd phase2
 3. Install the necessary dependencies:
    ```bash
    npm install
