@@ -10,4 +10,13 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://qualified-schnauzer-510.convex.site',
+        changeOrigin: true, // Ensures the Origin header matches the target
+        rewrite: (path) => path.replace(/^\/api/, ''), // Removes '/api' from the request URL
+      },
+    },
+  },
 });

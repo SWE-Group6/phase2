@@ -21,6 +21,7 @@ const generateResponse = async (action: string, pkg: any) => {
     if ('error' in cost) {
       return new Response(cost.error, { status: 500 });
     }
+
     return new Response(JSON.stringify(cost), { status: 200 });
   } else {
     if (!pkg) {
@@ -35,7 +36,7 @@ const generateResponse = async (action: string, pkg: any) => {
 export const getPackageByIdHTTPHandler = httpAction(async (ctx, request) => {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) {
-      return new Response("Unauthorized", { status: 403 });
+    return new Response("Unauthorized", { status: 403 });
   }
 
   const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
@@ -48,12 +49,12 @@ export const getPackageByIdHTTPHandler = httpAction(async (ctx, request) => {
   //Check if the user's email is in the orgList
   const isUserInOrg = orgList.data.some((membership: any) => membership.publicUserData?.identifier === userEmail);
   if (isUserInOrg) {
-  console.log(`User with email ${userEmail} is in the organization.`);
+    console.log(`User with email ${userEmail} is in the organization.`);
   } else {
-  console.log(`User with email ${userEmail} is NOT in the organization.`);
+    console.log(`User with email ${userEmail} is NOT in the organization.`);
   }
 
-  
+
   const url = new URL(request.url);
   const pathParts = url.pathname.split("/"); // Split the path into parts
   const packageId = pathParts[2]; // Assuming "/package/{id}/rate"
@@ -73,10 +74,11 @@ export const getPackageByIdHTTPHandler = httpAction(async (ctx, request) => {
 
   try {
     const pkg = await ctx.runQuery(api.queries.packageTable.getPackageById, { packageId }); // Fetch package using the query
-    if (pkg.metadata.Secret ==true && !isUserInOrg) {
+    if (pkg.metadata.Secret == true && !isUserInOrg) {
       //check if the secret is set by the member of the org: org_2plow6YcQeyrrUQEzl72EzJQmDA using clerk
       return new Response("User not allowed to access this package.", { status: 403 });
     }
+
     return await generateResponse(action, pkg); // Generate response using the new function
   } catch (error: any) {
     return new Response(error.message, { status: error.status || 404 });
