@@ -11,9 +11,9 @@ import { api } from '../../../convex/_generated/api';
 import { useAction } from 'convex/react';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import { useAuth } from '@clerk/clerk-react';
 
 export default function ComposedTextField() {
-  const uploadAction = useAction(api.actions.qualifyPackage.qualifyPackage);
 
   // State for dropdown and form fields
   const [formType, setFormType] = React.useState('URL');
@@ -24,19 +24,34 @@ export default function ComposedTextField() {
   const [name, setName] = React.useState('');
   const [zipBase64, setZipBase64] = React.useState('');
   const [secret, setSecret] = React.useState(false);
-  const [version, setVersion] = React.useState('');
+  const { getToken } = useAuth();
 
   const handleUpload = async () => {
+    const token = await getToken({template: "convex"});
+
     if (formType === 'URL') {
       // Validate URL form
       if (url.trim() ) {
-        uploadAction({
-          Data: {
-            URL: url.trim(),
-            JSProgram: jsProgram.trim() || '',
-            Secret: false,
+        
+        const body = {
+          URL: url,
+          JSProgram: jsProgram,
+          Secret: secret
+        };
+
+        const response = await fetch("/api/package", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
+          body: JSON.stringify(body),
         });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch the data");
+        }
+
         console.log('Uploading Package (URL form)...');
         setJsProgram('');
         setUrl('');
@@ -46,23 +61,35 @@ export default function ComposedTextField() {
     } else if (formType === 'Content') {
       // Validate Content form
       if (name.trim() && zipBase64.trim() ) {
-        uploadAction({
-          Data: {
-            Content: zipBase64,
-            JSProgram: jsProgram.trim() || '',
-            Name: name.trim(),
-            debloat: debloat_,
-            Secret: false,
-            Version: version.trim(),
+        
+        const body1 = {
+          Content: zipBase64,
+          JSProgram: jsProgram,
+          debloat: debloat_,
+          Name: name,
+          Secret: secret
+        };
+        console.log(JSON.stringify(body1));
+
+        const response = await fetch("/api/package", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
+          body: JSON.stringify(body1),
         });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch the data");
+        }
+
         console.log('Uploading Package (Content form)...');
         setContent('');
         setJsProgram('');
         setDebloat(false);
         setName('');
         setSecret(false);
-        setVersion('');
 
       } else {
         console.error('Invalid input. Content, Name, and Zip file are required.');
@@ -96,12 +123,12 @@ export default function ComposedTextField() {
   return (
     <Box
       component="form"
-      sx={{ '& > :not(style)': { m: 1 } }}
+      sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
       noValidate
       autoComplete="off"
     >
       {/* Dropdown Menu for Form Type */}
-      <FormControl fullWidth sx={{ marginBottom: 3 }}>
+      <FormControl fullWidth>
         <Select
           labelId="form-type-select-label"
           id="form-type-select"
@@ -116,16 +143,7 @@ export default function ComposedTextField() {
       {/* URL Form Fields */}
       {formType === 'URL' && (
         <>
-          {/* URL Input */}
-          <FormControl
-            variant="standard"
-            sx={{
-              '& .MuiInput-underline:before': { borderColor: 'gray' },
-              '& .MuiInput-underline:after': { borderColor: 'blue' },
-              '& .MuiInputLabel-root': { color: 'gray' },
-              '& .MuiInputLabel-root.Mui-focused': { color: 'blue' },
-            }}
-          >
+          <FormControl variant="standard">
             <InputLabel htmlFor="url-input">URL</InputLabel>
             <Input
               id="url-input"
@@ -135,16 +153,7 @@ export default function ComposedTextField() {
             />
           </FormControl>
 
-          {/* JavaScript Program Input */}
-          <FormControl
-            variant="standard"
-            sx={{
-              '& .MuiInput-underline:before': { borderColor: 'gray' },
-              '& .MuiInput-underline:after': { borderColor: 'blue' },
-              '& .MuiInputLabel-root': { color: 'gray' },
-              '& .MuiInputLabel-root.Mui-focused': { color: 'blue' },
-            }}
-          >
+          <FormControl variant="standard">
             <InputLabel htmlFor="js-program-input">JavaScript Program</InputLabel>
             <Input
               id="js-program-input"
@@ -153,22 +162,24 @@ export default function ComposedTextField() {
               placeholder="e.g., console.log('Hello, World!')"
             />
           </FormControl>
+
+          <FormControlLabel
+            control={
+              <Switch
+                checked={secret}
+                onChange={(e) => setSecret(e.target.checked)}
+                color="primary"
+              />
+            }
+            label="Secret"
+          />
         </>
       )}
 
       {/* Content Form Fields */}
       {formType === 'Content' && (
         <>
-          {/* File Input for ZIP */}
-          <FormControl
-            variant="standard"
-            sx={{
-              '& .MuiInput-underline:before': { borderColor: 'gray' },
-              '& .MuiInput-underline:after': { borderColor: 'blue' },
-              '& .MuiInputLabel-root': { color: 'gray' },
-              '& .MuiInputLabel-root.Mui-focused': { color: 'blue' },
-            }}
-          >
+          <FormControl variant="standard">
             <InputLabel htmlFor="zip-input"></InputLabel>
             <Input
               id="zip-input"
@@ -178,16 +189,7 @@ export default function ComposedTextField() {
             />
           </FormControl>
 
-          {/* JavaScript Program Input */}
-          <FormControl
-            variant="standard"
-            sx={{
-              '& .MuiInput-underline:before': { borderColor: 'gray' },
-              '& .MuiInput-underline:after': { borderColor: 'blue' },
-              '& .MuiInputLabel-root': { color: 'gray' },
-              '& .MuiInputLabel-root.Mui-focused': { color: 'blue' },
-            }}
-          >
+          <FormControl variant="standard">
             <InputLabel htmlFor="js-program-input">JavaScript Program</InputLabel>
             <Input
               id="js-program-input"
@@ -197,7 +199,6 @@ export default function ComposedTextField() {
             />
           </FormControl>
 
-          {/* Toggle for Debloat */}
           <FormControlLabel
             control={
               <Switch
@@ -207,19 +208,20 @@ export default function ComposedTextField() {
               />
             }
             label="Enable Debloat"
-            sx={{ marginTop: 1 }}
           />
 
-          {/* Name Input */}
-          <FormControl
-            variant="standard"
-            sx={{
-              '& .MuiInput-underline:before': { borderColor: 'gray' },
-              '& .MuiInput-underline:after': { borderColor: 'blue' },
-              '& .MuiInputLabel-root': { color: 'gray' },
-              '& .MuiInputLabel-root.Mui-focused': { color: 'blue' },
-            }}
-          >
+          <FormControlLabel
+            control={
+              <Switch
+                checked={secret}
+                onChange={(e) => setSecret(e.target.checked)}
+                color="primary"
+              />
+            }
+            label="Secret"
+          />
+
+          <FormControl variant="standard">
             <InputLabel htmlFor="name-input">Name</InputLabel>
             <Input
               id="name-input"
@@ -228,25 +230,11 @@ export default function ComposedTextField() {
               placeholder="e.g., Package Name"
             />
           </FormControl>
-          <FormControl variant="standard">
-            <InputLabel htmlFor="version-input">Version</InputLabel>
-            <Input
-              id="version-input"
-              value={version}
-              onChange={(e) => setVersion(e.target.value)}
-              placeholder="e.g., 1.0.0"
-            />
-          </FormControl>
         </>
       )}
 
       {/* Submit Button */}
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleUpload}
-        sx={{ marginTop: 2 }}
-      >
+      <Button variant="contained" color="primary" onClick={handleUpload}>
         Submit
       </Button>
     </Box>

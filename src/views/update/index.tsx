@@ -10,6 +10,7 @@ import { api } from '../../../convex/_generated/api';
 import { useAction } from 'convex/react';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import { useAuth } from '@clerk/clerk-react';
 
 export default function ComposedTextField() {
   const updateAction = useAction(api.actions.updatePackage.updatePackage);
@@ -23,21 +24,42 @@ export default function ComposedTextField() {
   const [zipBase64, setZipBase64] = React.useState('');
   const [version, setVersion] = React.useState('');
   const [id, setId] = React.useState('');
+  const { getToken } = useAuth();
 
   const handleUpload = async () => {
+    const token = await getToken({template: "convex"});
+
     if (formType === 'Content') {
       // Validate Content form
       if (zipBase64 && version.trim() && name.trim() && id.trim()) {
-        updateAction({
-          Data: {
-            Content: zipBase64,
-            JSProgram: jsProgram.trim() || '',
-            Version: version.trim(),
-            debloat: false,
-            Name: name.trim(),
-            ID: id.trim(),
+        const body = {
+          metadata: {
+            Name: name,
+            Version: version,
+            ID: id,
+            Secret: false
           },
+          data: {
+            Name: name,
+            URL: '',
+            Content: zipBase64,
+            JSProgram: jsProgram,
+            debloat: debloat_
+          }
+        };
+
+        const response = await fetch(`/api/package/${id}`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
         });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch the data");
+        }
         console.log('Updating Package (Content form)...');
         setZipBase64('');
         setJsProgram('');
@@ -50,18 +72,33 @@ export default function ComposedTextField() {
       }
     } else if (formType === 'URL') {
       // Validate URL form
-      if (url.trim() ) {
-        updateAction({
-          Data: {
-            URL: url.trim(),
-            Content: zipBase64,
-            JSProgram: jsProgram.trim() || '',
-            Version: version.trim(),
-            Name: name.trim(),
-            ID: id.trim(),
-            Secret: false,
+      if (url.trim()) {
+        const body = {
+          metadata: {
+            Name: name,
+            Version: version,
+            ID: id
           },
+          data: {
+            Name: name,
+            Content: 'F',
+            URL: url,
+            JSProgram: jsProgram
+          }
+        };
+
+        const response = await fetch(`/api/package/${id}`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
         });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch the data");
+        }
         console.log('Uploading Package (URL form)...');
         setUrl('');
         setJsProgram('');
@@ -95,7 +132,7 @@ export default function ComposedTextField() {
   return (
     <Box
       component="form"
-      sx={{ '& > :not(style)': { m: 1 } }}
+      sx={{ '& > :not(style)': { m: 1, width: '100%' } }} // Full-width form fields
       noValidate
       autoComplete="off"
     >
@@ -116,15 +153,7 @@ export default function ComposedTextField() {
       {formType === 'URL' && (
         <>
           {/* URL Input */}
-          <FormControl
-            variant="standard"
-            sx={{
-              '& .MuiInput-underline:before': { borderColor: 'gray' },
-              '& .MuiInput-underline:after': { borderColor: 'blue' },
-              '& .MuiInputLabel-root': { color: 'gray' },
-              '& .MuiInputLabel-root.Mui-focused': { color: 'blue' },
-            }}
-          >
+          <FormControl variant="standard" fullWidth>
             <InputLabel htmlFor="url-input">URL</InputLabel>
             <Input
               id="url-input"
@@ -134,35 +163,8 @@ export default function ComposedTextField() {
             />
           </FormControl>
 
-          {/* File Input for Content (ZIP file) */}
-          <FormControl
-            variant="standard"
-            sx={{
-              '& .MuiInput-underline:before': { borderColor: 'gray' },
-              '& .MuiInput-underline:after': { borderColor: 'blue' },
-              '& .MuiInputLabel-root': { color: 'gray' },
-              '& .MuiInputLabel-root.Mui-focused': { color: 'blue' },
-            }}
-          >
-            <InputLabel htmlFor="zip-input"></InputLabel>
-            <Input
-              id="zip-input"
-              type="file"
-              onChange={handleFileUpload}
-              inputProps={{ accept: '.zip' }}
-            />
-          </FormControl>
-
           {/* JavaScript Program Input */}
-          <FormControl
-            variant="standard"
-            sx={{
-              '& .MuiInput-underline:before': { borderColor: 'gray' },
-              '& .MuiInput-underline:after': { borderColor: 'blue' },
-              '& .MuiInputLabel-root': { color: 'gray' },
-              '& .MuiInputLabel-root.Mui-focused': { color: 'blue' },
-            }}
-          >
+          <FormControl variant="standard" fullWidth>
             <InputLabel htmlFor="js-program-input">JavaScript Program</InputLabel>
             <Input
               id="js-program-input"
@@ -172,35 +174,8 @@ export default function ComposedTextField() {
             />
           </FormControl>
 
-          {/* Version Input */}
-          <FormControl
-            variant="standard"
-            sx={{
-              '& .MuiInput-underline:before': { borderColor: 'gray' },
-              '& .MuiInput-underline:after': { borderColor: 'blue' },
-              '& .MuiInputLabel-root': { color: 'gray' },
-              '& .MuiInputLabel-root.Mui-focused': { color: 'blue' },
-            }}
-          >
-            <InputLabel htmlFor="version-input">Version</InputLabel>
-            <Input
-              id="version-input"
-              value={version}
-              onChange={(e) => setVersion(e.target.value)}
-              placeholder="e.g., 1.0.0"
-            />
-          </FormControl>
-
           {/* Name Input */}
-          <FormControl
-            variant="standard"
-            sx={{
-              '& .MuiInput-underline:before': { borderColor: 'gray' },
-              '& .MuiInput-underline:after': { borderColor: 'blue' },
-              '& .MuiInputLabel-root': { color: 'gray' },
-              '& .MuiInputLabel-root.Mui-focused': { color: 'blue' },
-            }}
-          >
+          <FormControl variant="standard" fullWidth>
             <InputLabel htmlFor="name-input">Name</InputLabel>
             <Input
               id="name-input"
@@ -211,15 +186,7 @@ export default function ComposedTextField() {
           </FormControl>
 
           {/* ID Input */}
-          <FormControl
-            variant="standard"
-            sx={{
-              '& .MuiInput-underline:before': { borderColor: 'gray' },
-              '& .MuiInput-underline:after': { borderColor: 'blue' },
-              '& .MuiInputLabel-root': { color: 'gray' },
-              '& .MuiInputLabel-root.Mui-focused': { color: 'blue' },
-            }}
-          >
+          <FormControl variant="standard" fullWidth>
             <InputLabel htmlFor="id-input">ID</InputLabel>
             <Input
               id="id-input"
@@ -234,17 +201,8 @@ export default function ComposedTextField() {
       {/* Content Form Fields */}
       {formType === 'Content' && (
         <>
-
           {/* File Input for Content (ZIP file) */}
-          <FormControl
-            variant="standard"
-            sx={{
-              '& .MuiInput-underline:before': { borderColor: 'gray' },
-              '& .MuiInput-underline:after': { borderColor: 'blue' },
-              '& .MuiInputLabel-root': { color: 'gray' },
-              '& .MuiInputLabel-root.Mui-focused': { color: 'blue' },
-            }}
-          >
+          <FormControl variant="standard" fullWidth>
             <InputLabel htmlFor="zip-input"></InputLabel>
             <Input
               id="zip-input"
@@ -255,15 +213,7 @@ export default function ComposedTextField() {
           </FormControl>
 
           {/* JavaScript Program Input */}
-          <FormControl
-            variant="standard"
-            sx={{
-              '& .MuiInput-underline:before': { borderColor: 'gray' },
-              '& .MuiInput-underline:after': { borderColor: 'blue' },
-              '& .MuiInputLabel-root': { color: 'gray' },
-              '& .MuiInputLabel-root.Mui-focused': { color: 'blue' },
-            }}
-          >
+          <FormControl variant="standard" fullWidth>
             <InputLabel htmlFor="js-program-input">JavaScript Program</InputLabel>
             <Input
               id="js-program-input"
@@ -273,16 +223,19 @@ export default function ComposedTextField() {
             />
           </FormControl>
 
+          <FormControlLabel
+            control={
+              <Switch
+                checked={debloat_}
+                onChange={(e) => setDebloat(e.target.checked)}
+                color="primary"
+              />
+            }
+            label="Enable Debloat"
+          />
+
           {/* Version Input */}
-          <FormControl
-            variant="standard"
-            sx={{
-              '& .MuiInput-underline:before': { borderColor: 'gray' },
-              '& .MuiInput-underline:after': { borderColor: 'blue' },
-              '& .MuiInputLabel-root': { color: 'gray' },
-              '& .MuiInputLabel-root.Mui-focused': { color: 'blue' },
-            }}
-          >
+          <FormControl variant="standard" fullWidth>
             <InputLabel htmlFor="version-input">Version</InputLabel>
             <Input
               id="version-input"
@@ -293,15 +246,7 @@ export default function ComposedTextField() {
           </FormControl>
 
           {/* Name Input */}
-          <FormControl
-            variant="standard"
-            sx={{
-              '& .MuiInput-underline:before': { borderColor: 'gray' },
-              '& .MuiInput-underline:after': { borderColor: 'blue' },
-              '& .MuiInputLabel-root': { color: 'gray' },
-              '& .MuiInputLabel-root.Mui-focused': { color: 'blue' },
-            }}
-          >
+          <FormControl variant="standard" fullWidth>
             <InputLabel htmlFor="name-input">Name</InputLabel>
             <Input
               id="name-input"
@@ -312,15 +257,7 @@ export default function ComposedTextField() {
           </FormControl>
 
           {/* ID Input */}
-          <FormControl
-            variant="standard"
-            sx={{
-              '& .MuiInput-underline:before': { borderColor: 'gray' },
-              '& .MuiInput-underline:after': { borderColor: 'blue' },
-              '& .MuiInputLabel-root': { color: 'gray' },
-              '& .MuiInputLabel-root.Mui-focused': { color: 'blue' },
-            }}
-          >
+          <FormControl variant="standard" fullWidth>
             <InputLabel htmlFor="id-input">ID</InputLabel>
             <Input
               id="id-input"
@@ -337,7 +274,7 @@ export default function ComposedTextField() {
         variant="contained"
         color="primary"
         onClick={handleUpload}
-        sx={{ marginTop: 2 }}
+        sx={{ width: '100%', marginTop: 2 }} // Button takes up full width
       >
         Submit
       </Button>

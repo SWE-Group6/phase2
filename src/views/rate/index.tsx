@@ -20,7 +20,7 @@ export default function Rate() {
       try {
         const token = await getToken({template: "convex"});
 
-        const response = await fetch(`/api/package/${trimmedPackageID}/rate`, {
+        const response = await fetch(`api/package/${trimmedPackageID}/rate`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
