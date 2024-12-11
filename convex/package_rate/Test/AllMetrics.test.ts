@@ -1,41 +1,58 @@
-import { expect } from 'chai';
-import { AllMetrics } from '../Models/AllMetrics';
+import { convexTest } from "convex-test";
+import { expect, test } from "vitest";
+import schema from "../../schema"; // Assuming schema is defined for Convex
 
-describe('AllMetrics', () => {
-  let allMetrics: AllMetrics;
-  jest.setTimeout(30000);
+// Importing the AllMetrics class for testing
+import { AllMetrics } from "../Models/AllMetrics";
 
-  beforeEach(() => {
-    allMetrics = new AllMetrics('https://github.com/cloudinary/cloudinary_npm');
-  });
+test("AllMetrics - Initialize all metrics", async () => {
+  const t = convexTest(schema);
+  const allMetrics = new AllMetrics("https://github.com/lodash/lodash");
 
-  it('should initialize all metrics', () => {
-    expect(allMetrics.metrics.length).to.equal(5);
-  });
+  expect(allMetrics.metrics.length).toBe(7); // Expecting 5 metrics to be initialized
+});
 
-  it('should be an instance of AllMetrics', () => {
-    expect(allMetrics).to.be.an.instanceOf(AllMetrics);
-  });
+test("AllMetrics - Instance check", async () => {
+  const t = convexTest(schema);
+  const allMetrics = new AllMetrics("https://github.com/lodash/lodash");
 
-  it('should calculate the score for all metrics', async () => {
-    await allMetrics.calculateNetScore();
-    expect(allMetrics.getNetScore()).to.be.within(0, 1);
-  });
+  expect(allMetrics).toBeInstanceOf(AllMetrics); // Checking instance type
+});
 
-  it('should calculate the latency for all metrics', async () => {
-    await allMetrics.calculateNetScore(); // Ensure the score is calculated before checking latency
-    expect(allMetrics.getNetScoreLatency()).to.be.a('number');
-  });
+test("AllMetrics - Calculate net score", async () => {
+  const t = convexTest(schema);
+  const allMetrics = new AllMetrics("https://github.com/lodash/lodash");
 
-  it('should check the url type for github', () => {
-    expect(allMetrics.checkUrlType("https://github.com/cloudinary/cloudinary_npm")).to.equal('github');
-  });
+  await allMetrics.calculateNetScore(); // Calculating net score
+  expect(allMetrics.getNetScore()).toBeGreaterThanOrEqual(0); // Net score should be >= 0
+  expect(allMetrics.getNetScore()).toBeLessThanOrEqual(1); // Net score should be <= 1
+});
 
-  it('should check the url type for npm', () => {
-    expect(allMetrics.checkUrlType("https://www.npmjs.com/package/bootstrap")).to.equal('npm');
-  });
-  it ('should return null if the url is invalid', () => {
-    expect(allMetrics.checkUrlType("www.example.com")).to.equal('unknown');
-  }); 
+test("AllMetrics - Calculate latency", async () => {
+  const t = convexTest(schema);
+  const allMetrics = new AllMetrics("https://github.com/lodash/lodash");
 
+  await allMetrics.calculateNetScore(); // Ensure score calculation before checking latency
+  expect(typeof allMetrics.getNetScoreLatency()).toBe("number"); // Latency should be a number
+});
+
+test("AllMetrics - Check URL type for GitHub", async () => {
+  const t = convexTest(schema);
+  const allMetrics = new AllMetrics("https://github.com/lodash/lodash");
+
+  expect(allMetrics.checkUrlType("https://github.com/lodash/lodash")).toBe("github");
+});
+
+test("AllMetrics - Check URL type for npm", async () => {
+  const t = convexTest(schema);
+  const allMetrics = new AllMetrics("https://github.com/lodash/lodash");
+
+  expect(allMetrics.checkUrlType("https://www.npmjs.com/package/bootstrap")).toBe("npm");
+});
+
+test("AllMetrics - Check URL type for invalid URL", async () => {
+  const t = convexTest(schema);
+  const allMetrics = new AllMetrics("https://github.com/lodash/lodash");
+
+  expect(allMetrics.checkUrlType("www.example.com")).toBe("unknown");
 });
