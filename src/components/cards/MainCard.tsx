@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import React, { forwardRef } from 'react';
 import { SxProps, Theme } from '@mui/material/styles';
 
@@ -86,19 +85,5 @@ const MainCard: React.FC<MainCardProps> = forwardRef<HTMLDivElement, MainCardPro
     );
   }
 );
-
-MainCard.propTypes = {
-  border: PropTypes.bool,
-  boxShadow: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
-  children: PropTypes.node,
-  content: PropTypes.bool,
-  contentClass: PropTypes.string,
-  contentSX: PropTypes.object,
-  darkTitle: PropTypes.bool,
-  secondary: PropTypes.node,
-  shadow: PropTypes.bool,
-  sx: PropTypes.object,
-  title: PropTypes.node,
-};
 
 export default MainCard;

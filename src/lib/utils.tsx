@@ -1,21 +1,19 @@
 import { type ClassValue, clsx } from "clsx";
-import { ForwardRefRenderFunction, forwardRef } from "react";
+import { ForwardRefRenderFunction, forwardRef, PropsWithoutRef } from "react";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// forward refs
-export function fr<T = HTMLElement, P = React.HTMLAttributes<T>>(
+export function fr<T = HTMLElement, P = {}>(
   component: ForwardRefRenderFunction<T, P>
 ) {
-  const wrapped = forwardRef(component);
-  wrapped.displayName = component.name;
-  return wrapped;
+  return forwardRef<T, PropsWithoutRef<P>>((props, ref) => 
+    component(props as P, ref)
+  );
 }
 
-// styled element
 export function se<
   T = HTMLElement,
   P extends React.HTMLAttributes<T> = React.HTMLAttributes<T>
