@@ -11,10 +11,12 @@ export const getPackageById = query({
         throw new Error("Unauthorized");
     }
     const pkg = await ctx.db.get(args.packageId); // Fetch the package by ID
-    pkg.metadata.ID = pkg._id;
+    console.log('Package:', pkg);
     if (!pkg) {
       throw new Error(`Package with ID ${args.packageId} not found.`);
     }
+    pkg.metadata.ID = pkg._id;
+    
     return pkg;
   },
 });
@@ -35,9 +37,11 @@ export const getPackagesMetadata = query({
     handler: async (ctx: any, args: any) => {
         console.log('args:', args);
         const identity = await ctx.auth.getUserIdentity();
+        console.log(identity);
         if (!identity) {
             throw new Error("Unauthorized");
         }
+        
         let dbQuery = ctx.db.query("packageTable");
 
         // Apply name filter at the database level if provided
