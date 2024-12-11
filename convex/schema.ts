@@ -37,7 +37,7 @@ export default defineSchema(
       value: v.number(),
     }),
   },
-
+  
   // If you ever get an error about schema mismatch
   // between your data and your schema, and you cannot
   // change the schema to match the current data in your database,
