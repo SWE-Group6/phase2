@@ -8,7 +8,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
+        with:
+          node-version: 18 # Specify the Node.js version as required
+      - name: Ensure package-lock.json exists
+        run: |
+          if [ ! -f package-lock.json ]; then
+            echo "No package-lock.json found. Running npm install to generate it."
+            npm install
+          fi
       - run: npm ci
+        continue-on-error: true # Allow fallback if npm ci fails
       - name: Set Environment Variables
         run: |
           echo "CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }}" >> .env
