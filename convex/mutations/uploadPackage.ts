@@ -40,7 +40,7 @@ export const uploadPackage = mutation({
 
     // Insert the package into the database and return its unique ID
     const uniqueID = await ctx.db.insert("packageTable", packageData);
-
+    console.log(`Package uploaded successfully with ID: ${uniqueID}`);
     return uniqueID;
   },
 });

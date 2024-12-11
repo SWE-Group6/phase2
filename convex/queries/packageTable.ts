@@ -11,10 +11,12 @@ export const getPackageById = query({
       throw new Error("Unauthorized");
     }
     const pkg = await ctx.db.get(args.packageId); // Fetch the package by ID
-    pkg.metadata.ID = pkg._id;
+    console.log('Package:', pkg);
     if (!pkg) {
       throw new Error(`Package with ID ${args.packageId} not found.`);
     }
+    pkg.metadata.ID = pkg._id;
+    
     return pkg;
   },
 });

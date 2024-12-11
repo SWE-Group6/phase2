@@ -1,65 +1,90 @@
-import { expect } from 'chai';
-import { PulledCode } from '../Models/PulledCode';
+import { convexTest } from "convex-test";
+import { expect, test, describe } from "vitest";
+import schema from "../../schema"; // Assuming schema is defined for Convex
 
+// Importing the PulledCode class for testing
+import { PulledCode } from "../Models/PulledCode";
 
-describe('PulledCode', () => {
-    describe('Final Output of PulledCode score', () => {
-        it('should calculate the PulledCode score', async () => {
+describe("PulledCode", () => {
+  describe("Final Output of PulledCode score", () => {
+    test(
+      "Calculate the PulledCode score",
+      async () => {
+        const t = convexTest(schema);
+        const pulledCode = new PulledCode("https://github.com/cloudinary/cloudinary_npm");
+        await pulledCode.calculateScoreGithub();
+        expect(pulledCode.getScore()).toBeGreaterThanOrEqual(0);
+        expect(pulledCode.getScore()).toBeLessThanOrEqual(1);
+      },
+      60000 // Timeout
+    );
 
-            const pulledCode = new PulledCode('https://github.com/cloudinary/cloudinary_npm');
-            await pulledCode.calculateScoreGithub();
-            expect(pulledCode.getScore()).to.be.within(0, 1);
-        }, 60000)
+    test(
+      "Calculate the latency for PulledCode",
+      async () => {
+        const t = convexTest(schema);
+        const pulledCode = new PulledCode("https://github.com/cloudinary/cloudinary_npm");
+        await pulledCode.calculateScoreGithub();
+        expect(typeof pulledCode.getLatency()).toBe("number");
+      },
+      60000 // Timeout
+    );
 
-        it('should calculate the latency for PulledCode', async () => {
-            const pulledCode = new PulledCode('https://github.com/cloudinary/cloudinary_npm');
-            await pulledCode.calculateScoreGithub();
-            expect(pulledCode.getLatency()).to.be.a('number');
-        }, 60000);
-
-        it('should be an instance of PulledCode', () => {
-            const pulledCode = new PulledCode('https://github.com/cloudinary/cloudinary_npm');
-            expect(pulledCode).to.be.an.instanceOf(PulledCode);
-        });
-    })
-
-    /*
-    describe('getPullLinesOfCode', () => {
-        it('should return lines of code coming from pull requests', async () => {
-            const pulledcode = new PulledCode('');
-            const pull_lines = await pulledcode.getPullLinesOfCode('SWE-Group6', 'phase1');
-            expect(pull_lines).to.equal(8442);
-        })
-    })
-
-    describe('getTotalCodeLines', () => {
-        const expectedTotalLines = 11127; // Your expected total lines of code
-        const delta = expectedTotalLines * 0.05;
-
-        it('should return the correct total lines of code', async () => {
-            const pulledcode = new PulledCode('https://github.com/SWE-Group6/phase1');
-            const totalLines = await pulledcode.getTotalCodeLines('SWE-Group6', 'Software-Engineering-Project');
-            expect(totalLines).closeTo(expectedTotalLines, delta);
-        }, 60000);
+    test("Instance check for PulledCode", () => {
+      const t = convexTest(schema);
+      const pulledCode = new PulledCode("https://github.com/cloudinary/cloudinary_npm");
+      expect(pulledCode).toBeInstanceOf(PulledCode);
     });
+  });
 
-    describe('analyzeUrl', () => {
-        it('should return the correct owner and repo', () => {
-            const pulledcode = new PulledCode('https://github.com/SWE-Group6/phase1')
-            const result = pulledcode.analyzeUrl('https://github.com/microsoft/TypeScript');
-            expect(result).to.deep.equal({
-                owner: 'microsoft',
-                repo: 'TypeScript', // Make sure the repo name matches case sensitivity
-            });
-        });
+  /*
+  describe("getPullLinesOfCode", () => {
+    test("Return lines of code coming from pull requests", async () => {
+      const t = convexTest(schema);
+      const pulledcode = new PulledCode("");
+      const pull_lines = await pulledcode.getPullLinesOfCode("SWE-Group6", "phase1");
+      expect(pull_lines).toBe(8442);
     });
+  });
 
-    describe('getGitHubUrl', () => {
-        it('should return the correct GitHub URL', async () => {
-            const pulledcode = new PulledCode('https://www.npmjs.com/package/typescript');
-            const gitHubUrl = await pulledcode.getGitHubUrl();
-            expect(gitHubUrl).to.equal('https://github.com/microsoft/TypeScript');
-        });
+  describe("getTotalCodeLines", () => {
+    const expectedTotalLines = 11127; // Your expected total lines of code
+    const delta = expectedTotalLines * 0.05;
+
+    test(
+      "Return the correct total lines of code",
+      async () => {
+        const t = convexTest(schema);
+        const pulledcode = new PulledCode("https://github.com/SWE-Group6/phase1");
+        const totalLines = await pulledcode.getTotalCodeLines(
+          "SWE-Group6",
+          "Software-Engineering-Project"
+        );
+        expect(totalLines).toBeCloseTo(expectedTotalLines, delta);
+      },
+      60000 // Timeout
+    );
+  });
+
+  describe("analyzeUrl", () => {
+    test("Return the correct owner and repo", () => {
+      const t = convexTest(schema);
+      const pulledcode = new PulledCode("https://github.com/SWE-Group6/phase1");
+      const result = pulledcode.analyzeUrl("https://github.com/microsoft/TypeScript");
+      expect(result).toEqual({
+        owner: "microsoft",
+        repo: "TypeScript", // Make sure the repo name matches case sensitivity
+      });
     });
-    */
+  });
+
+  describe("getGitHubUrl", () => {
+    test("Return the correct GitHub URL", async () => {
+      const t = convexTest(schema);
+      const pulledcode = new PulledCode("https://www.npmjs.com/package/typescript");
+      const gitHubUrl = await pulledcode.getGitHubUrl();
+      expect(gitHubUrl).toBe("https://github.com/microsoft/TypeScript");
+    });
+  });
+  */
 });
