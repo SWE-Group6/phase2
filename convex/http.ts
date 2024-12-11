@@ -50,15 +50,15 @@ http.route({
 });
 
 http.route({
-	path: "/package",
-	method: "POST",
-	handler: uploadPackageHandler,
+    path: "/package",
+    method: "POST",
+    handler: uploadPackageHandler,
 });
 
 http.route({
-	pathPrefix: "/package/", // TODO update path accordingly.
-	method: "POST",
-	handler: updatePackageHandler,
+    pathPrefix: "/package/", // TODO update path accordingly.
+    method: "POST",
+    handler: updatePackageHandler,
 });
 // authenticate route
 http.route({
