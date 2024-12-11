@@ -113,6 +113,7 @@
     "tailwindcss": "^3.3.3",
     "typescript": "^5.2.2",
     "vite": "^4.4.9",
-    "vitest": "^2.1.8"
+    "vitest": "^2.1.8",
+    "@mui/core-downloads-tracker": "^6.1.0"
   }
 }
