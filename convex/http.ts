@@ -8,6 +8,7 @@ import { resetHandler } from "./handlers/resetHandler";
 import { uploadPackageHandler } from "./handlers/uploadPackageHandler";
 import { updatePackageHandler } from "./handlers/updatePackageHandler";
 import { authenticateHandler } from "./handlers/authenticateHandler";
+import {httpAction} from "./_generated/server";
 
 const http = httpRouter();
 
@@ -67,5 +68,35 @@ http.route({
     handler: authenticateHandler,
 });
 
+http.route({
+    pathPrefix: "/package/",
+    method: "OPTIONS",
+    handler: httpAction(async (_, request) => {
+        // Make sure the necessary headers are present
+        // for this to be a valid pre-flight request
+        const headers = request.headers;
+        if (
+          headers.get("Origin") !== null &&
+          headers.get("Access-Control-Request-Method") !== null &&
+          headers.get("Access-Control-Request-Headers") !== null
+        ) {
+            const optionhHeaders = new Headers({
+                    // e.g. https://mywebsite.com, configured on your Convex dashboard
+                    "Access-Control-Allow-Origin": process.env.CLIENT_ORIGIN!,
+                    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                    "Access-Control-Allow-Headers": "Authorization, Content-Type",
+                    "Access-Control-Max-Age": "86400",
+                    Vary: "origin",
+                    "Access-Control-Allow-Credentials": "true",
+
+                  });
+            
+            console.log('OPTIONS request headers:', optionhHeaders);
+          return new Response(null, {status: 200, headers: optionhHeaders} );
+        } else {
+          return new Response();
+        }
+    })
+});
 
 export default http;
