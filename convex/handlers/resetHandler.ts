@@ -3,7 +3,13 @@ import { api } from "../_generated/api";
 import { createClerkClient } from "@clerk/backend";
 
 export const resetHandler = httpAction(async (ctx, request) => {
-
+    let headers = new Headers({
+        "Access-Control-Allow-Origin": process.env.CLIENT_ORIGIN!,
+        "Vary": "Origin",
+        "Access-Control-Allow-Methods": "DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Authorization, Content-Type",
+        "Access-Control-Allow-Credentials": "true", 
+      });
     const identity = await ctx.auth.getUserIdentity();
     console.log('Identity:', identity);
     const userId = identity?.subject;
@@ -46,7 +52,7 @@ export const resetHandler = httpAction(async (ctx, request) => {
             }
         }
 
-        return new Response(JSON.stringify({}));
+        return new Response("Registry is reset", { status: 200, headers: headers });
 
     } catch (error: any) {
         return new Response(error.message, { status: error.status || 404 })
