@@ -7,13 +7,22 @@ import { createClerkClient } from "@clerk/backend";
 let dependency = false;
 // Function to generate a response based on the action
 const generateResponse = async (action: string, pkg: any) => {
+  let headers = new Headers({
+    "Access-Control-Allow-Origin": process.env.CLIENT_ORIGIN!,
+    "Vary": "Origin",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Authorization, Content-Type",
+    "Access-Control-Allow-Credentials": "true", 
+  });
+
   if (action === 'rate') {
     const packageUrl = pkg["data"]["URL"];
     const metrics = await ratePackage(packageUrl);
     if (metrics.error) {
       return new Response(metrics.error, { status: 500 });
     }
-    return new Response(JSON.stringify(metrics), { status: 200 });
+    return new Response(JSON.stringify(metrics), { status: 200, headers: headers,
+});
   }
   if (action === 'cost') {
     const packageName = pkg["metadata"]["Name"];
@@ -22,13 +31,13 @@ const generateResponse = async (action: string, pkg: any) => {
       return new Response(cost.error, { status: 500 });
     }
 
-    return new Response(JSON.stringify(cost), { status: 200 });
+    return new Response(JSON.stringify(cost), { status: 200, headers: headers });
   } else {
     if (!pkg) {
       console.log('Package not found.');
       return new Response(`Package not found.`, { status: 404 });
     }
-    return new Response(JSON.stringify(pkg), { status: 200 });
+    return new Response(JSON.stringify(pkg), { status: 200, headers: headers });
   }
 }
 
