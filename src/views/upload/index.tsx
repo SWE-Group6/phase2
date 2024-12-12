@@ -7,6 +7,7 @@ import InputLabel from '@mui/material/InputLabel';
 import Button from '@mui/material/Button';
 import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import CircularProgress from '@mui/material/CircularProgress';
 import { api } from '../../../convex/_generated/api';
 import { useAction } from 'convex/react';
 import Select from '@mui/material/Select';
@@ -24,76 +25,90 @@ export default function ComposedTextField() {
   const [name, setName] = React.useState('');
   const [zipBase64, setZipBase64] = React.useState('');
   const [secret, setSecret] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
   const { getToken } = useAuth();
 
   const handleUpload = async () => {
-    const token = await getToken({template: "convex"});
+    // Set loading to true at the start of upload
+    setIsLoading(true);
 
-    if (formType === 'URL') {
-      // Validate URL form
-      if (url.trim() ) {
-        
-        const body = {
-          URL: url,
-          JSProgram: jsProgram,
-          Secret: secret
-        };
+    try {
+      const token = await getToken({template: "convex"});
 
-        const response = await fetch("/api/package", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(body),
-        });
+      if (formType === 'URL') {
+        // Validate URL form
+        if (url.trim() ) {
+          
+          const body = {
+            URL: url,
+            JSProgram: jsProgram,
+            Secret: secret
+          };
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch the data");
+          const response = await fetch(`${import.meta.env.VITE_CONVEX_HTTP_URL}/package`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(body),
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch the data");
+          }
+
+          console.log('Uploading Package (URL form)...');
+          setJsProgram('');
+          setUrl('');
+        } else {
+          console.error('Invalid input. URL is required.');
         }
+      } else if (formType === 'Content') {
+        // Validate Content form
+        if (name.trim() && zipBase64.trim() ) {
+          
+          const body1 = {
+            Content: zipBase64,
+            JSProgram: jsProgram,
+            debloat: debloat_,
+            Name: name,
+            Secret: secret
+          };
+          console.log(JSON.stringify(body1));
 
-        console.log('Uploading Package (URL form)...');
-        setJsProgram('');
-        setUrl('');
-      } else {
-        console.error('Invalid input. URL is required.');
-      }
-    } else if (formType === 'Content') {
-      // Validate Content form
-      if (name.trim() && zipBase64.trim() ) {
-        
-        const body1 = {
-          Content: zipBase64,
-          JSProgram: jsProgram,
-          debloat: debloat_,
-          Name: name,
-          Secret: secret
-        };
-        console.log(JSON.stringify(body1));
+          const response = await fetch(`${import.meta.env.VITE_CONVEX_HTTP_URL}/package`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(body1),
+          });
 
-        const response = await fetch("/api/package", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(body1),
-        });
+          if (!response.ok) {
+            throw new Error("Failed to fetch the data");
+          }
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch the data");
+          console.log('Uploading Package (Content form)...');
+          setContent('');
+          setJsProgram('');
+          setDebloat(false);
+          setName('');
+          setSecret(false);
+          setZipBase64(''); // Clear the zip base64
+        } else {
+          console.error('Invalid input. Content, Name, and Zip file are required.');
         }
-
-        console.log('Uploading Package (Content form)...');
-        setContent('');
-        setJsProgram('');
-        setDebloat(false);
-        setName('');
-        setSecret(false);
-
-      } else {
-        console.error('Invalid input. Content, Name, and Zip file are required.');
       }
+    } catch (error) {
+      console.error('Upload failed:', error);
+      // Optionally, you could add error state or show a snackbar/toast
+    } finally {
+      // Set loading to false when upload is complete (success or failure)
+      setIsLoading(false);
     }
   };
 
@@ -233,9 +248,15 @@ export default function ComposedTextField() {
         </>
       )}
 
-      {/* Submit Button */}
-      <Button variant="contained" color="primary" onClick={handleUpload}>
-        Submit
+      {/* Submit Button with Loading State */}
+      <Button 
+        variant="contained" 
+        color="primary" 
+        onClick={handleUpload}
+        disabled={isLoading} // Disable button while loading
+        startIcon={isLoading ? <CircularProgress size={20} /> : null}
+      >
+        {isLoading ? 'Uploading...' : 'Submit'}
       </Button>
     </Box>
   );

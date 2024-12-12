@@ -15,7 +15,13 @@ else, we can set the secret parameter to be false by default.
 
 export const uploadPackageHandler = httpAction(async (ctx, request) => {
 	try { 
-		
+		let headers = new Headers({
+            "Access-Control-Allow-Origin": process.env.CLIENT_ORIGIN!,
+            "Vary": "Origin",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Authorization, Content-Type",
+            "Access-Control-Allow-Credentials": "true", 
+          });
         const body = await request.json();
 		
 		const { Content, URL, JSProgram, debloat, Name} = body;
@@ -79,7 +85,7 @@ export const uploadPackageHandler = httpAction(async (ctx, request) => {
         // If there's no conflict, return the success response.
         return new Response(
             JSON.stringify(result),
-            { status:  201 } // Created or appropriate success code.
+            { status:  201, headers:headers } // Created or appropriate success code.
         );
 	} catch (error) {
         console.error("Error in uploadPackageHandler:", error); // Log the error for debugging
