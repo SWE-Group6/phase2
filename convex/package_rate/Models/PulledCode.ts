@@ -55,7 +55,12 @@ export class PulledCode extends Metric {
 
         const end = Date.now();
         this.latency = end - start;
-        this.score = totallines / pulllines;
+        if (pulllines > totallines) {
+            this.score = totallines / pulllines;
+        }
+        else {
+            this.score = pulllines / totallines;
+        }
         console.log("Pulled Lines: " + pulllines);
         console.log("Total Lines: " + totallines);
         console.log("Pulled Score: " + this.score);
@@ -74,7 +79,12 @@ export class PulledCode extends Metric {
 
             const end = Date.now();
             this.latency = end - start;
-            this.score = pulllines / totallines;
+            if (pulllines > totallines) {
+                this.score = totallines / pulllines;
+            }
+            else {
+                this.score = pulllines / totallines;
+            }
         } else {
             const end = Date.now();
             this.latency = end - start;
