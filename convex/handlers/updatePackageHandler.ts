@@ -3,8 +3,17 @@ import { action, ActionCtx, httpAction } from "../_generated/server";
 import { updatePackage } from "../actions/updatePackage";
 
 export const updatePackageHandler = httpAction(async (ctx, request) => {
-	try {
+	let headers = new Headers({
+        "Access-Control-Allow-Origin": process.env.CLIENT_ORIGIN!,
+        "Vary": "Origin",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Authorization, Content-Type",
+        "Access-Control-Allow-Credentials": "true", 
+      });
+    
+    try {
 		const body = await request.json();
+        console.log('Body:', body);
 		const Name = body.metadata.Name;
         const Version = body.metadata.Version;
         const ID = body.metadata.ID;
@@ -22,6 +31,7 @@ export const updatePackageHandler = httpAction(async (ctx, request) => {
         }
         let result;
         if((Content && URL)) {
+            console.log("Version:", Version);
             result = await ctx.runAction(api.actions.updatePackage.updatePackage, {                        
                 Data: {
                     Content,
@@ -61,7 +71,7 @@ export const updatePackageHandler = httpAction(async (ctx, request) => {
          // If there's no conflict, return the success response. 
          return new Response(
              JSON.stringify(result),
-             { status: result.metadata.code || 200 } // Created or appropriate success code.
+             { status: result.metadata.code || 200, headers: headers } // Created or appropriate success code.
          );
 	} catch (error) {
         // Log the error for debugging purposes

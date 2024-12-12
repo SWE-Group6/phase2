@@ -11,6 +11,9 @@ import { useAction } from 'convex/react';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import { useAuth } from '@clerk/clerk-react';
+import CircularProgress from '@mui/material/CircularProgress';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 export default function ComposedTextField() {
   const updateAction = useAction(api.actions.updatePackage.updatePackage);
@@ -26,88 +29,134 @@ export default function ComposedTextField() {
   const [id, setId] = React.useState('');
   const { getToken } = useAuth();
 
+  // New state for loading and notifications
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [notification, setNotification] = React.useState<{
+    open: boolean;
+    message: string;
+    severity: 'success' | 'error';
+  }>({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
+
+  const handleCloseNotification = () => {
+    setNotification(prev => ({ ...prev, open: false }));
+  };
+
   const handleUpload = async () => {
-    const token = await getToken({template: "convex"});
+    setIsLoading(true);
+    try {
+      const token = await getToken({template: "convex"});
 
-    if (formType === 'Content') {
-      // Validate Content form
-      if (zipBase64 && version.trim() && name.trim() && id.trim()) {
-        const body = {
-          metadata: {
-            Name: name,
-            Version: version,
-            ID: id,
-            Secret: false
-          },
-          data: {
-            Name: name,
-            URL: '',
-            Content: zipBase64,
-            JSProgram: jsProgram,
-            debloat: debloat_
+      if (formType === 'Content') {
+        // Validate Content form
+        if (zipBase64 && version.trim() && name.trim() && id.trim()) {
+          const body = {
+            metadata: {
+              Name: name,
+              Version: version,
+              ID: id,
+              Secret: false
+            },
+            data: {
+              Name: name,
+              URL: '',
+              Content: zipBase64,
+              JSProgram: jsProgram,
+              debloat: debloat_
+            }
+          };
+
+          const response = await fetch(`${import.meta.env.VITE_CONVEX_HTTP_URL}/package/${id}`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to update package");
           }
-        };
 
-        const response = await fetch(`/api/package/${id}`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(body),
-        });
+          // Success notification
+          setNotification({
+            open: true,
+            message: 'Package updated successfully!',
+            severity: 'success'
+          });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch the data");
+          // Reset form
+          setZipBase64('');
+          setJsProgram('');
+          setVersion('');
+          setDebloat(false);
+          setName('');
+          setId('');
+        } else {
+          throw new Error('Invalid input. All fields are required.');
         }
-        console.log('Updating Package (Content form)...');
-        setZipBase64('');
-        setJsProgram('');
-        setVersion('');
-        setDebloat(false);
-        setName('');
-        setId('');
-      } else {
-        console.error('Invalid input. All fields are required.');
-      }
-    } else if (formType === 'URL') {
-      // Validate URL form
-      if (url.trim()) {
-        const body = {
-          metadata: {
-            Name: name,
-            Version: version,
-            ID: id
-          },
-          data: {
-            Name: name,
-            Content: 'F',
-            URL: url,
-            JSProgram: jsProgram
+      } else if (formType === 'URL') {
+        // Validate URL form
+        if (url.trim() && version.trim()) {
+          const body = {
+            metadata: {
+              Name: name,
+              Version: version,
+              ID: id
+            },
+            data: {
+              Name: name,
+              Content: "kg2f57mc797wpc0ew5smgj5mzn76b5gg",
+              URL: url,
+              JSProgram: jsProgram
+            }
+          };
+
+          const response = await fetch(`${import.meta.env.VITE_CONVEX_HTTP_URL}/package/${id}`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to upload package");
           }
-        };
 
-        const response = await fetch(`/api/package/${id}`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(body),
-        });
+          // Success notification
+          setNotification({
+            open: true,
+            message: 'Package updated successfully!',
+            severity: 'success'
+          });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch the data");
+          // Reset form
+          setUrl('');
+          setJsProgram('');
+          setVersion('');
+          setName('');
+          setId('');
+        } else {
+          throw new Error('Invalid input. URL and Version are required.');
         }
-        console.log('Uploading Package (URL form)...');
-        setUrl('');
-        setJsProgram('');
-        setVersion('');
-        setName('');
-        setId('');
-      } else {
-        console.error('Invalid input. URL and ZIP file are required.');
       }
+    } catch (error) {
+      // Error notification
+      setNotification({
+        open: true,
+        message: error instanceof Error ? error.message : 'An unexpected error occurred',
+        severity: 'error'
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -195,6 +244,17 @@ export default function ComposedTextField() {
               placeholder="e.g., Package ID"
             />
           </FormControl>
+
+          {/* Version Input */}
+          <FormControl variant="standard" fullWidth>
+            <InputLabel htmlFor="version-input">Version</InputLabel>
+            <Input
+              id="version-input"
+              value={version}
+              onChange={(e) => setVersion(e.target.value)}
+              placeholder="e.g., 1.0.0"
+            />
+          </FormControl>
         </>
       )}
 
@@ -269,15 +329,43 @@ export default function ComposedTextField() {
         </>
       )}
 
-      {/* Submit Button */}
+      {/* Submit Button with Loading State */}
       <Button
         variant="contained"
         color="primary"
         onClick={handleUpload}
-        sx={{ width: '100%', marginTop: 2 }} // Button takes up full width
+        disabled={isLoading}
+        sx={{ width: '100%', marginTop: 2 }}
       >
-        Submit
+        {isLoading ? <CircularProgress size={24} /> : 'Submit'}
       </Button>
+
+      {/* Notification Snackbar */}
+      <Snackbar
+        open={notification.open}
+        autoHideDuration={6000}
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        sx={{
+          '& .MuiSnackbar-root': {
+            width: 'auto',
+            maxWidth: '300px',
+            right: 16,
+            bottom: 16,
+          },
+          '& .MuiAlert-root': {
+            width: 'auto',
+          }
+        }}
+      >
+        <Alert
+          onClose={handleCloseNotification}
+          severity={notification.severity}
+          sx={{ width: 'auto', maxWidth: '300px' }}
+        >
+          {notification.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

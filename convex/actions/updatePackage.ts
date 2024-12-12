@@ -95,6 +95,7 @@ export const updatePackage = action({
 			filters.Version = VersionString;
 		}
 		const nameAndVersionresult = await ctx.runQuery(api.queries.packageTable.getPackagesMetadata, {paginationOpts: {numItems: limit, cursor: offset }, filters}); 
+		console.log('Name and Version Result:', nameResult);
 		if(nameAndVersionresult.packagesData.length > 0) {
 			return {
 				conflict: true,
@@ -104,6 +105,8 @@ export const updatePackage = action({
 				},
 			};
 		}
+		console.log('Name and Version:', nameAndVersionresult);
+		console.log("The version number is greater than the current version number.");
 		
 		//upload the package
 		let result;
