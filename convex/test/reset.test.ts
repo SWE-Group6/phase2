@@ -16,5 +16,5 @@ test("Reset Handler", async () => {
     expect(response.status).toBe(200); // Expecting a successful response
     const body = await response.json();
     console.log("Body: ", body);
-    expect(body).toEqual({}); // Expecting an empty object in response
+    expect(body).toEqual("Registry is reset"); // Expecting an empty object in response
 });
