@@ -14,7 +14,7 @@ import { api } from '../../../convex/_generated/api';
 import { useAction } from 'convex/react';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import { useAuth } from '@clerk/clerk-react';
+import { useAuth, useUser } from '@clerk/clerk-react';
 
 export default function ComposedTextField() {
 
@@ -28,12 +28,34 @@ export default function ComposedTextField() {
   const [zipBase64, setZipBase64] = React.useState('');
   const [secret, setSecret] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [canSetSecret, setCanSetSecret] = React.useState(false);
   const [notification, setNotification] = React.useState({
     open: false,
     message: '',
     severity: 'success' as 'success' | 'error'
   });
   const { getToken } = useAuth();
+  const { user } = useUser();
+
+  // Check organization membership when component mounts
+  React.useEffect(() => {
+    const checkOrgMembership = async () => {
+      if (user) {
+        const orgId = 'org_2plow6YcQeyrrUQEzl72EzJQmDA';
+        const membership = user.organizationMemberships.find(
+          membership => membership.organization.id === orgId
+        );
+        
+        setCanSetSecret(!!membership);
+        // Reset secret to false if user is not in the org
+        if (!membership) {
+          setSecret(false);
+        }
+      }
+    };
+
+    checkOrgMembership();
+  }, [user]);
 
   const handleCloseNotification = () => {
     setNotification({ ...notification, open: false });
@@ -44,16 +66,15 @@ export default function ComposedTextField() {
     setIsLoading(true);
 
     try {
-      const token = await getToken({template: "convex"});
+      const token = await getToken({ template: "convex" });
 
       if (formType === 'URL') {
         // Validate URL form
-        if (url.trim() ) {
-          
+        if (url.trim()) {
           const body = {
             URL: url,
             JSProgram: jsProgram,
-            Secret: secret
+            Secret: canSetSecret ? secret : false
           };
 
           const response = await fetch(`${import.meta.env.VITE_CONVEX_HTTP_URL}/package`, {
@@ -67,13 +88,16 @@ export default function ComposedTextField() {
           });
 
           if (!response.ok) {
+            if (response.status === 403) {
+              throw new Error("User is not authorized to upload packages.");
+            }
             throw new Error("Failed to fetch the data");
           }
 
           console.log('Uploading Package (URL form)...');
           setJsProgram('');
           setUrl('');
-          
+
           // Show success notification
           setNotification({
             open: true,
@@ -91,16 +115,14 @@ export default function ComposedTextField() {
         }
       } else if (formType === 'Content') {
         // Validate Content form
-        if (name.trim() && zipBase64.trim() ) {
-          
+        if (name.trim() && zipBase64.trim()) {
           const body1 = {
             Content: zipBase64,
             JSProgram: jsProgram,
             debloat: debloat_,
             Name: name,
-            Secret: secret
+            Secret: canSetSecret ? secret : false
           };
-          console.log(JSON.stringify(body1));
 
           const response = await fetch(`${import.meta.env.VITE_CONVEX_HTTP_URL}/package`, {
             method: "POST",
@@ -113,6 +135,9 @@ export default function ComposedTextField() {
           });
 
           if (!response.ok) {
+            if (response.status === 403) {
+              throw new Error("User is not authorized to upload packages.");
+            }
             throw new Error("Failed to fetch the data");
           }
 
@@ -123,7 +148,7 @@ export default function ComposedTextField() {
           setName('');
           setSecret(false);
           setZipBase64(''); // Clear the zip base64
-          
+
           // Show success notification
           setNotification({
             open: true,
@@ -140,12 +165,12 @@ export default function ComposedTextField() {
           });
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Upload failed:', error);
       // Show error notification
       setNotification({
         open: true,
-        message: 'Upload failed. Please try again.',
+        message: error.message || 'Upload failed. Please try again.',
         severity: 'error'
       });
     } finally {
@@ -220,16 +245,19 @@ export default function ComposedTextField() {
             />
           </FormControl>
 
-          <FormControlLabel
-            control={
-              <Switch
-                checked={secret}
-                onChange={(e) => setSecret(e.target.checked)}
-                color="primary"
-              />
-            }
-            label="Secret"
-          />
+          {/* Secret Switch (conditionally rendered) */}
+          {canSetSecret && (
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={secret}
+                  onChange={(e) => setSecret(e.target.checked)}
+                  color="primary"
+                />
+              }
+              label="Secret"
+            />
+          )}
         </>
       )}
 
@@ -267,16 +295,19 @@ export default function ComposedTextField() {
             label="Enable Debloat"
           />
 
-          <FormControlLabel
-            control={
-              <Switch
-                checked={secret}
-                onChange={(e) => setSecret(e.target.checked)}
-                color="primary"
-              />
-            }
-            label="Secret"
-          />
+          {/* Secret Switch (conditionally rendered) */}
+          {canSetSecret && (
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={secret}
+                  onChange={(e) => setSecret(e.target.checked)}
+                  color="primary"
+                />
+              }
+              label="Secret"
+            />
+          )}
 
           <FormControl variant="standard">
             <InputLabel htmlFor="name-input">Name</InputLabel>
