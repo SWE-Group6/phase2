@@ -8,6 +8,8 @@ import Button from '@mui/material/Button';
 import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import CircularProgress from '@mui/material/CircularProgress';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 import { api } from '../../../convex/_generated/api';
 import { useAction } from 'convex/react';
 import Select from '@mui/material/Select';
@@ -26,7 +28,16 @@ export default function ComposedTextField() {
   const [zipBase64, setZipBase64] = React.useState('');
   const [secret, setSecret] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [notification, setNotification] = React.useState({
+    open: false,
+    message: '',
+    severity: 'success' as 'success' | 'error'
+  });
   const { getToken } = useAuth();
+
+  const handleCloseNotification = () => {
+    setNotification({ ...notification, open: false });
+  };
 
   const handleUpload = async () => {
     // Set loading to true at the start of upload
@@ -62,8 +73,21 @@ export default function ComposedTextField() {
           console.log('Uploading Package (URL form)...');
           setJsProgram('');
           setUrl('');
+          
+          // Show success notification
+          setNotification({
+            open: true,
+            message: 'Package uploaded successfully!',
+            severity: 'success'
+          });
         } else {
           console.error('Invalid input. URL is required.');
+          // Show error notification
+          setNotification({
+            open: true,
+            message: 'Invalid input. URL is required.',
+            severity: 'error'
+          });
         }
       } else if (formType === 'Content') {
         // Validate Content form
@@ -99,13 +123,31 @@ export default function ComposedTextField() {
           setName('');
           setSecret(false);
           setZipBase64(''); // Clear the zip base64
+          
+          // Show success notification
+          setNotification({
+            open: true,
+            message: 'Package uploaded successfully!',
+            severity: 'success'
+          });
         } else {
           console.error('Invalid input. Content, Name, and Zip file are required.');
+          // Show error notification
+          setNotification({
+            open: true,
+            message: 'Invalid input. Content, Name, and Zip file are required.',
+            severity: 'error'
+          });
         }
       }
     } catch (error) {
       console.error('Upload failed:', error);
-      // Optionally, you could add error state or show a snackbar/toast
+      // Show error notification
+      setNotification({
+        open: true,
+        message: 'Upload failed. Please try again.',
+        severity: 'error'
+      });
     } finally {
       // Set loading to false when upload is complete (success or failure)
       setIsLoading(false);
@@ -258,6 +300,22 @@ export default function ComposedTextField() {
       >
         {isLoading ? 'Uploading...' : 'Submit'}
       </Button>
+
+      {/* Notification Snackbar */}
+      <Snackbar
+        open={notification.open}
+        autoHideDuration={6000}
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={handleCloseNotification}
+          severity={notification.severity}
+          sx={{ width: '100%' }}
+        >
+          {notification.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
