@@ -55,7 +55,10 @@ export class PulledCode extends Metric {
 
         const end = Date.now();
         this.latency = end - start;
-        this.score = pulllines / totallines;
+        this.score = totallines / pulllines;
+        console.log("Pulled Lines: " + pulllines);
+        console.log("Total Lines: " + totallines);
+        console.log("Pulled Score: " + this.score);
     }
 
     async calculateScoreNPM(): Promise<void> {

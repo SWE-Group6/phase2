@@ -36,6 +36,8 @@ export class AllMetrics {
                 // console.log("Score: " + metric.getScore());
                 // console.log("Weight: " + metric.weight);
                 this.netScore += metric.getScore() * metric.weight;
+                console.log("Metric Score: " + metric.getScore());
+                console.log("Metric Weight: " + metric.weight);
                 this.netScoreLatency += metric.getLatency();
             });
         }
@@ -48,6 +50,8 @@ export class AllMetrics {
                 // console.log("Weight: " + metric.weight);
                 this.netScore += metric.getScore() * metric.weight;
                 this.netScoreLatency += metric.getLatency();
+                console.log("Metric Score: " + metric.getScore());
+                console.log("Metric Weight: " + metric.weight);
             });
         }
 
