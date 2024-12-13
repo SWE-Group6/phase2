@@ -8,11 +8,11 @@ To get the project running locally:
 3. Setup environmental variables in convex dashboard (see [docs] (https://docs.convex.dev/auth/clerk#configuring-dev-and-prod-instances))  
    CLERK_JWT_ISSUER_DOMAIN=https://flowing-pangolin-4.clerk.accounts.dev  
    CLERK_JWT_KEY=                  
-   CLERK_SECRET_KEY=Secret Key from clerk API keys section  
+   CLERK_SECRET_KEY=  
    CLIENT_ORIGIN=https://main.dlriba99c1q5m.amplifyapp.com  
-   GITHUB_TOKEN=Personal github token    
-   OPENAI_API_KEY=Personal OpenAI API key    
-   VITE_CLERK_PUBLISHABLE_KEY=Publishable Key from clerk API keys section   
+   GITHUB_TOKEN=    
+   OPENAI_API_KEY=    
+   VITE_CLERK_PUBLISHABLE_KEY=  
 
 5. Clone the repository and move to repo:
    ```bash
